@@ -33,7 +33,8 @@
 #include "OSD_Config.h"
 
 
-#define VERSION_RELEASE_12_10_1				// OpenPilot-RELEASE 12.10.1	Major Release from October 26th, 2012
+//#define VERSION_RELEASE_12_10_1	// OpenPilot-RELEASE 12.10.1	Release from 2012.10.26
+#define VERSION_RELEASE_12_10_2		// OpenPilot-RELEASE 12.10.2	Release from 2012.12.21	'Mayan Apocalypse'
 
 
 
@@ -41,9 +42,8 @@
 // TODO enhancement:
 // Generate the following automatically out of the XML files.
 // These object constants are version dependent!
-// Get them with OpenPilot tool e.g. uavobjgenerator -flight
 
-#ifdef VERSION_RELEASE_12_10_1
+#if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2
 
 #define	FLIGHTTELEMETRYSTATS_OBJID			0x2F7E2902
 #define	GCSTELEMETRYSTATS_OBJID				0xABC72744
@@ -118,7 +118,7 @@
 #define	SYSTEMALARMS_ALARM_GPS				14
 #define	SYSTEMALARMS_ALARM_BOOTFAULT			15
 
-#endif // VERSION_RELEASE_12_10_1
+#endif // defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2
 
 
 
