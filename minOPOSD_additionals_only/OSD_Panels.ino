@@ -599,11 +599,26 @@ void panBatteryPercent(int first_col, int first_line){
 // Staus  : done
 
 void panTime(int first_col, int first_line){
+// JRChange: JR specials
+#ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > 1A for the 1st time
+    static unsigned long engine_start_time = 0;
+    
+    if (engine_start_time == 0 && osd_curr_A > 100) {
+        engine_start_time = millis();
+    }
+    start_Time = (millis() - engine_start_time)/1000;
+    
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    osd.printf("%c%2i%c%02i", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
+    osd.closePanel();
+#else
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     start_Time = millis()/1000;
     osd.printf("%c%2i%c%02i", 0xB3,((int)start_Time/60)%60,0x3A,(int)start_Time%60);
     osd.closePanel();
+#endif
 }
 
 /* **************************************************************** */
