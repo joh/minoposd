@@ -8,7 +8,7 @@
 #endif
 
 // JRChange: Flight Batt on MinimOSD:
-#define HIGHEST_SETUP_MENU	5
+#define HIGHEST_SETUP_MENU	11
 
 /******* STARTUP PANEL *******/
 
@@ -137,6 +137,7 @@ void panRSSI(int first_col, int first_line){
 // Staus  : done
 
 void panSetup(){
+    int delta = 100;
 
     if (millis() > text_timer){
         text_timer = millis() + 500;
@@ -179,47 +180,64 @@ void panSetup(){
                 break;
             }
 // JRChange: Flight Batt on MinimOSD:
+        case 5:
+		delta /= 10;
+        case 4:
+		delta /= 10;
         case 3:
-            {
-                //if (volt_div_ratio < 1500) volt_div_ratio = 1500;
 		// volt_div_ratio
                 osd.printf_P(PSTR("Calibrate|measured volt: "));
                 osd.printf("%c%5.2f%c", 0xE2, (float)osd_vbat_A, 0x8E);
-                osd.printf("||volt div ratio: %5.2f", volt_div_ratio/100.0);
-                volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR);
+                osd.printf("||volt div ratio:  %5i", volt_div_ratio);
+                volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR, delta);
                 break;
-            }
-        case 4:
-            {
-                //if (curr_amp_offset > 5370) curr_amp_offset = 5370;
+        case 8:
+		delta /= 10;
+        case 7:
+		delta /= 10;
+        case 6:
 		// curr_amp_offset
                 osd.printf_P(PSTR("Calibrate|measured amp:  "));
                 osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
-                osd.printf("||amp offset:     %6.4f", curr_amp_offset/10000.0);
-                curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR);
+                osd.printf("||amp offset:      %5i", curr_amp_offset);
+                curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR, delta);
                 break;
-            }
-        case 5:
-            {
-                //if (curr_amp_per_volt < 9300) curr_amp_per_volt = 9300;
+        case 11:
+		delta /= 10;
+        case 10:
+		delta /= 10;
+        case 9:
 		// curr_amp_per_volt
                 osd.printf_P(PSTR("Calibrate|measured amp:  "));
                 osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
-                osd.printf("||amp per volt:    %5.2f", curr_amp_per_volt/100.0);
-                curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR);
+                osd.printf("||amp per volt:    %5i", curr_amp_per_volt);
+                curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR, delta);
                 break;
-            }
         }
     }
     osd.closePanel();
 }
 
 
-int change_int_val(int value, int address)
+int change_int_val(int value, int address, int delta)
 {
     int value_old = value;
-    if (chan1_raw > chan1_raw_middle + 100) value--;
-    if (chan1_raw < chan1_raw_middle - 100) value++;
+    
+    osd.printf( "|                   ");
+    switch (delta) {
+        case 100:
+            osd.printf_P(PSTR("\x5E"));
+	break;
+        case 10:
+            osd.printf_P(PSTR(" \x5E"));
+	break;
+        case 1:
+            osd.printf_P(PSTR("  \x5E"));
+	break;
+    }
+		
+    if (chan1_raw > chan1_raw_middle + 100) value -= delta;
+    if (chan1_raw < chan1_raw_middle - 100) value += delta;
 
     if (value != value_old && osd_set) {
 	EEPROM.write(address, value&0xff);

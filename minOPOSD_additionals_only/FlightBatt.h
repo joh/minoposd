@@ -25,7 +25,7 @@
  */
 
 
-// !!! For using this, you have to solder a little bit on the MinimOSD !!!
+// !!! For using this, you have to solder a little bit on the MinimOSD, see the wiki !!!
 
 
 #ifndef FLIGHT_BATT_H_
@@ -40,17 +40,12 @@
 #define REF_VOLTAGE			1.1			// INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
 #define LOW_VOLTAGE			9.6			// filter start value for 3s LiPo
 
-//
-// For calibration calculate the following:
-//
-//	current volt_div_ratio / OSD value * measured value => new volt_div_ratio
-//
 
-#define VOLT_DIV_RATIO			15.55			// Vref 1.1V based: This is the proper value for a 16k0/1k1 voltage divider usable up to 4s LiPo
+#define VOLT_DIV_RATIO			15.55			// Vref 1.1V based: This is the start value for calibrating a 16k0/1k1 voltage divider usable up to 4s LiPo
 
 // !!! for the +-50A Current Sensor(AC/DC) DFRobot SEN0098 we need approx. a 1/4 voltage divider 3k0/1k1 so that we stay below 1.1 V -> 2*50A * 0.04V/A / (4.1/1.1) = 1.073 V !!!
-#define CURR_AMP_PER_VOLT		93.20	// 87.26	// Vref 1.1V based: This is the proper value for a +-50A Current Sensor(AC/DC) DFRobot SEN0098 Sensitivity: 40 mV/A
-#define CURR_AMPS_OFFSET		0.5365	// 0.5		// Vref 1.1V based: This is the proper value for a +-50A Current Sensor(AC/DC) DFRobot SEN0098 Sensitivity: 40 mV/A
+#define CURR_AMP_PER_VOLT		100.00			// Vref 1.1V based: This is the start value for calibrating a +-50A Current Sensor(AC/DC) DFRobot SEN0098 Sensitivity: 40 mV/A
+#define CURR_AMPS_OFFSET		0.5000			// Vref 1.1V based: This is the start value for calibrating a +-50A Current Sensor(AC/DC) DFRobot SEN0098 Sensitivity: 40 mV/A
 
 #define CURRENT_VOLTAGE(x)		((x)*REF_VOLTAGE/1024.0)*(volt_div_ratio/100.0)
 #define CURRENT_AMPS(x)			(((x)*REF_VOLTAGE/1024.0)-(curr_amp_offset/10000.0))*(curr_amp_per_volt/100.0)

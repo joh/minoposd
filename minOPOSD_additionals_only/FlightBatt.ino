@@ -25,7 +25,7 @@
  */
 
 
-// !!! For using this, you have to solder a little bit on the MinimOSD !!!
+// !!! For using this, you have to solder a little bit on the MinimOSD, see the wiki !!!
 
 
 #include "FlightBatt.h"
@@ -41,8 +41,8 @@ void flight_batt_read(void)
 {
 	static float voltage = LOW_VOLTAGE * 1.05;	// battery voltage, initialized above the low voltage threshold to pre-load the filter and prevent low voltage events at startup
 	static float current_amps = 0;			// battery instantaneous currrent draw [A]
-	static float current_total = 0;			// totalized battery current [Ah]
-	static unsigned long loopTimer = 0; // TODO = millis();
+	static float current_total = 0;			// totalized battery current [mAh]
+	static unsigned long loopTimer = 0;
 	uint16_t delta_ms;
 
 	if (loopTimer + MEASURE_PERIOD <= millis()) {
@@ -50,10 +50,7 @@ void flight_batt_read(void)
 		loopTimer      	= millis();
 		
 		voltage		= CURRENT_VOLTAGE(analogRead(VOLTAGE_PIN)) * .2 + voltage * .8;		// reads battery voltage pin
-		current_amps	= CURRENT_AMPS(analogRead(CURRENT_PIN)) * .2 + current_amps * .8; 	// reads battery sensor current pin
-#if 1
-	        current_amps	= 0;  // TODO currently I have no current sensor available
-#endif
+		current_amps	= CURRENT_AMPS(analogRead(CURRENT_PIN)) * .1 + current_amps * .9; 	// reads battery sensor current pin
 		current_total	+= current_amps * (float) delta_ms * 0.0002778;				// .0002778 is 1/3600 (conversion to hours)
 		osd_vbat_A	= voltage;
 		osd_curr_A	= current_amps * 100;
