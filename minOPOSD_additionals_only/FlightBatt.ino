@@ -50,7 +50,7 @@ void flight_batt_read(void)
 		loopTimer      	= millis();
 		
 		voltage		= CURRENT_VOLTAGE(analogRead(VOLTAGE_PIN)) * .2 + voltage * .8;		// reads battery voltage pin
-		current_amps	= CURRENT_AMPS(analogRead(CURRENT_PIN)) * .1 + current_amps * .9; 	// reads battery sensor current pin
+		current_amps	= CURRENT_AMPS(analogRead(CURRENT_PIN)) * .2 + current_amps * .8; 	// reads battery sensor current pin
 		current_total	+= current_amps * (float) delta_ms * 0.0002778;				// .0002778 is 1/3600 (conversion to hours)
 		osd_vbat_A	= voltage;
 		osd_curr_A	= current_amps * 100;
