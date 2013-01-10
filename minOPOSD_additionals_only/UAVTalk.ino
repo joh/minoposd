@@ -413,6 +413,7 @@ int uavtalk_read(void) {
 					osd_alt			= uavtalk_get_float(&msg, GPSPOSITION_OBJ_ALTITUDE);
 					osd_groundspeed		= uavtalk_get_float(&msg, GPSPOSITION_OBJ_GROUNDSPEED);
 				break;
+				// because of #define PIOS_GPS_MINIMAL in the OP flight code, the following is unfortunately currently not supported:
 				case GPSTIME_OBJID:
                                         response = UAVTALK_TYPE_ACK;
         				osd_time_hour		= uavtalk_get_int8(&msg, GPSTIME_OBJ_HOUR);
