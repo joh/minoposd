@@ -776,6 +776,10 @@ void panGPL(int first_col, int first_line){
     else if(osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x11\x20";
         //osd.printf_P(PSTR("\x11\x20"));
     osd.printf("%s",gps_str);
+// JRChange: JR specials
+#ifdef JR_SPECIALS	// I use this place for debug info
+    osd.printf("%02x", op_alarm);
+#endif
 
     /*  if(osd_fix_type <= 1) {
     osd.printf_P(PSTR("\x10"));
@@ -798,8 +802,9 @@ void panGPSats(int first_col, int first_line){
     osd.printf("%c%2i", 0x0f,osd_satellites_visible);
 // JRChange: JR specials
 #ifdef JR_SPECIALS	// I use this place for GPS hour:minute
-    osd.printf("|%02i:%02i", osd_time_hour, osd_time_minute);
-    osd.printf(" %02x", op_alarm);
+    if (osd_time_hour + osd_time_minute > 0) {
+        osd.printf("|%02i:%02i", osd_time_hour, osd_time_minute);
+    }
 #endif
     osd.closePanel();
 }
