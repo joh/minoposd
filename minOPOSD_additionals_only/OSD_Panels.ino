@@ -1001,6 +1001,58 @@ void panFlightMode(int first_col, int first_line){
 }
 
 
+// JRChange:
+#if 0
+/* **************************************************************** */
+// Panel  : panOtherUAV
+// Needs  : X, Y locations
+// Needs  : globals: oUAV_lat, oUAV_lon, oUAV_alt, osd_heading
+// Output : shows some mystic info
+// Size   : 3 x 6  (rows x chars)
+// Status : just an idea and not to forget
+//          not compiled
+//          not tested
+//          not ready
+// ToDo   : refactor with function setHomeVars
+
+void panOtherUAV(int first_col, int first_line){
+    float dstlon, dstlat;
+    long oUAV_distance;
+    long oUAV_bearing;
+    uint8_t oUAV_direction;
+    
+    // shrinking factor for longitude going to poles direction
+    float rads = fabs(oUAV_lat) * 0.0174532925;
+    double scaleLongDown = cos(rads);
+    double scaleLongUp   = 1.0f/cos(rads);
+   
+    // DST to oUAV
+    dstlat = fabs(oUAV_lat - osd_lat) * 111319.5;
+    dstlon = fabs(oUAV_lon - osd_lon) * 111319.5 * scaleLongDown;
+    oUAV_distance = sqrt(sq(dstlat) + sq(dstlon));
+    
+    // DIR to oUAV
+    dstlon = (oUAV_lon - osd_lon);					// OffSet X
+    dstlat = (oUAV_lat - osd_lat) * scaleLongUp;			// OffSet Y
+    oUAV_bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775);		// absolut oUAV direction
+    if (oUAV_bearing < 0) oUAV_bearing += 360;				// normalization
+    oUAV_bearing = oUAV_bearing - 180;					// absolut goal direction
+    if (oUAV_bearing < 0) oUAV_bearing += 360;				// normalization
+    oUAV_bearing = oUAV_bearing - osd_heading;				// relative oUAV direction
+    if (oUAV_bearing < 0) oUAV_bearing += 360;				// normalization
+    oUAV_direction = round((float)(oUAV_bearing/360.0f) * 16.0f) + 1;	// array of arrows
+    if (oUAV_direction > 16) oUAV_direction = 0;
+    
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    osd.printf("D%4.0f%c|", (double)((float)(oUAV_distance) * converth), high);
+    osd.printf("A%4.0f%c|  ", (double)((oUAV_alt - osd_alt) * converth), high);
+    showArrow((uint8_t)oUAV_direction,0);
+    osd.closePanel();
+}
+#endif
+
+
 // ---------------- EXTRA FUNCTIONS ----------------------
 // Show those fancy 2 char arrows
 void showArrow(uint8_t rotate_arrow,uint8_t method) {  
