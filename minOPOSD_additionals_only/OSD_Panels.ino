@@ -91,7 +91,14 @@ void writePanels(){
 
         // this could be replaced with a No Mavlink warning so the last seen values still show
 
+// JRChange: OpenPilot UAVTalk:
+#ifdef PROTOCOL_UAVTALK
+        if (waitingMAVBeats == 0) {
+            osd.clear();
+        }
+#else
         osd.clear();
+#endif
         waitingMAVBeats = 1;
         // Display our logo and wait... 
         panWaitMAVBeats(5,10); //Waiting for MAVBeats...
