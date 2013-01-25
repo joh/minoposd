@@ -181,8 +181,8 @@ void setup()
     osd.clear();
     mavlinkTimer.Enable();
     
-// JRChange: Flight Batt on MinimOSD:
-#ifdef FLIGHT_BATT_ON_MINIMOSD
+// JRChange: OpenPilot UAVTalk:
+#ifdef PROTOCOL_UAVTALK
     writePanels();       // for initial 'Waiting for ...' message
 #endif
 
