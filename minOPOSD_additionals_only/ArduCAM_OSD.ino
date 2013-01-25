@@ -180,6 +180,11 @@ void setup()
     // House cleaning, clear display and enable timers
     osd.clear();
     mavlinkTimer.Enable();
+    
+// JRChange: Flight Batt on MinimOSD:
+#ifdef FLIGHT_BATT_ON_MINIMOSD
+    writePanels();       // for initial 'Waiting for ...' message
+#endif
 
 } // END of setup();
 
