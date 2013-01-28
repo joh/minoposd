@@ -51,7 +51,9 @@ void writePanels(){
                 //Testing bits from 8 bit register B
                 if(ISb(panel,Rose_BIT)) panRose(panRose_XY[0][panel], panRose_XY[1][panel]);        //13x3
                 if(ISb(panel,Head_BIT)) panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]); //13x3
+#ifndef PROTOCOL_UAVTALK
                 if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
+#endif
 
                 if(osd_got_home == 1){
                     if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
@@ -79,7 +81,9 @@ void writePanels(){
                 //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
                 if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
                 if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
+#ifndef PROTOCOL_UAVTALK
                 if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
+#endif
                 if(ISd(panel,RSSI_BIT)) panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]); //??x??
             } else { //panel == npanels
                 if(ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]); // this must be here so warnings are always checked
@@ -379,6 +383,8 @@ void panOff(){
         }    
     }
 }
+
+#ifndef PROTOCOL_UAVTALK
 //* **************************************************************** */
 // Panel  : panTune
 // Needs  : X, Y locations
@@ -394,6 +400,7 @@ void panOff(){
 
   osd.closePanel();
 }
+#endif
 
 /* **************************************************************** */
 // Panel  : panCur_A
@@ -880,6 +887,7 @@ void panBoot(int first_col, int first_line){
     osd.closePanel();
 }
 
+#ifndef PROTOCOL_UAVTALK
 /* **************************************************************** */
 // Panel  : panMavBeat
 // Needs  : X, Y locations
@@ -900,7 +908,7 @@ void panMavBeat(int first_col, int first_line){
     }
     osd.closePanel();
 }
-
+#endif
 
 /* **************************************************************** */
 // Panel  : panWPDir
