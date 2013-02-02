@@ -10,6 +10,8 @@
 #define PROTOCOL_UAVTALK
 // JRChange: Flight Batt on MinimOSD:
 #define FLIGHT_BATT_ON_MINIMOSD
+// JRChange: PacketRxOk on MinimOSD:
+#define PACKETRXOK_ON_MINIMOSD
 // JRChange: JR specials
 //#define JR_SPECIALS
 

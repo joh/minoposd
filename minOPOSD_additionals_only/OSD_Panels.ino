@@ -7,6 +7,11 @@
 #include "FlightBatt.h"
 #endif
 
+// JRChange: PacketRxOk on MinimOSD:
+#ifdef PACKETRXOK_ON_MINIMOSD
+#include "PacketRxOk.h"
+#endif
+
 // JRChange: Flight Batt on MinimOSD:
 #define HIGHEST_SETUP_MENU	11
 
@@ -130,6 +135,13 @@ void writePanels(){
 // Staus  : done
 
 void panRSSI(int first_col, int first_line){
+// JRChange: PacketRxOk on MinimOSD:
+#ifdef PACKETRXOK_ON_MINIMOSD
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    PacketRxOk_print();
+    osd.closePanel();
+#else
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     rssi = (int16_t)osd_rssi;
@@ -140,6 +152,7 @@ void panRSSI(int first_col, int first_line){
     if (rssi < -99) rssi = -99;
     osd.printf("%c%3i%c", 0xE1, rssi, 0x25); 
     osd.closePanel();
+#endif
 }
 
 /* **************************************************************** */
@@ -539,12 +552,13 @@ void panWarn(int first_col, int first_line){
                     if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < batt_warn_level) warning_type = 4;
 #endif
                     break;
-// JRChange: disabled for testing
-#if 0
                 case 5:
+// JRChange: PacketRxOk on MinimOSD:
+#ifdef PACKETRXOK_ON_MINIMOSD
+		    rssi = PacketRxOk_get();
+#endif
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
                     break;
-#endif
                 }
                 if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
             }
@@ -762,9 +776,9 @@ void panLogo(){
     osd.openPanel();
 #ifdef PROTOCOL_UAVTALK
 #ifdef JR_SPECIALS
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.0.1 JRS"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.1.0 JRS"));
 #else
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.0.1"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.1.0"));
 #endif
 #else
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.1"));

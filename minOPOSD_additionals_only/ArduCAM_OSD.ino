@@ -174,6 +174,11 @@ void setup()
     flight_batt_init();
 #endif
 
+// JRChange: PacketRxOk on MinimOSD:
+#ifdef PACKETRXOK_ON_MINIMOSD
+    PacketRxOk_init();
+#endif
+
     // Startup MAVLink timers  
     mavlinkTimer.Set(&OnMavlinkTimer, 120);
 
