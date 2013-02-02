@@ -38,7 +38,9 @@ void writePanels(){
             {
                 if(ISd(panel,Warn_BIT)) panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]); // this must be here so warnings are always checked
                 //Testing bits from 8 bit register A 
+#ifndef PROTOCOL_UAVTALK
                 if(ISa(panel,Cen_BIT)) panCenter(panCenter_XY[0][panel], panCenter_XY[1][panel]);   //4x2
+#endif
                 if(ISa(panel,Pit_BIT)) panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]); //5x1
                 if(ISa(panel,Rol_BIT)) panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]); //5x1
                 if(ISa(panel,BatA_BIT)) panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]); //7x1
@@ -671,6 +673,7 @@ void panHomeDis(int first_col, int first_line){
     osd.closePanel();
 }
 
+#ifndef PROTOCOL_UAVTALK
 /* **************************************************************** */
 // Panel  : panCenter
 // Needs  : X, Y locations
@@ -684,6 +687,7 @@ void panCenter(int first_col, int first_line){
     osd.printf_P(PSTR("\x05\x03\x04\x05|\x15\x13\x14\x15"));
     osd.closePanel();
 }
+#endif
 
 /* **************************************************************** */
 // Panel  : panHorizon
