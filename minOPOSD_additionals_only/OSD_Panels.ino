@@ -969,14 +969,14 @@ void panFlightMode(int first_col, int first_line){
 // JRChange: OpenPilot UAVTalk:
 #ifdef PROTOCOL_UAVTALK
     char* mode_str="";
-    if      (osd_mode == 0) mode_str = "man";	// MANUAL
-    else if (osd_mode == 1) mode_str = "st1";	// STABILIZED1
-    else if (osd_mode == 2) mode_str = "st2";	// STABILIZED2
-    else if (osd_mode == 3) mode_str = "st3"; 	// STABILIZED3
-    else if (osd_mode == 4) mode_str = "at ";	// AUTOTUNE
-    else if (osd_mode == 5) mode_str = "ah ";	// ALTITUDEHOLD
-    else if (osd_mode == 5) mode_str = "vc ";	// VELOCITYCONTROL
-    else if (osd_mode == 5) mode_str = "ph ";	// POSITIONHOLD
+    if      (osd_mode == FLIGHTSTATUS_FLIGHTMODE_MANUAL         ) mode_str = "man";	// MANUAL
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1    ) mode_str = "st1";	// STABILIZED1
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2    ) mode_str = "st2";	// STABILIZED2
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3    ) mode_str = "st3";	// STABILIZED3
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE       ) mode_str = "at ";	// AUTOTUNE
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD   ) mode_str = "ah ";	// ALTITUDEHOLD
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL) mode_str = "vc ";	// VELOCITYCONTROL
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD   ) mode_str = "ph ";	// POSITIONHOLD
     osd.printf("%c%s", 0xE0, mode_str);
     if (osd_armed == 0 || osd_armed == 1) {	// unarmed
         osd.printf("-");
