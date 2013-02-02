@@ -262,8 +262,16 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 			}
 			else {
 				msg->Length += ((uint16_t) c) << 8;
-				status = UAVTALK_PARSE_STATE_GOT_LENGTH;
-				cnt = 0;
+                                if ((msg->Length < 8) || (msg->Length > 255 + 8)) {
+                                       // Drop corrupted messages:
+                                       // Minimal length is 8 (headers)
+                                       // Maximum is 8 (headers) + 255 (Data) + 2 (Optional Instance Id)
+                                       // As we are not parsing Instance Id, 255 is a hard maximum. 
+				       status = UAVTALK_PARSE_STATE_WAIT_SYNC;
+                                } else {
+				       status = UAVTALK_PARSE_STATE_GOT_LENGTH;
+				       cnt = 0;
+                                }
 			}
 		break;
 		case UAVTALK_PARSE_STATE_GOT_LENGTH:
