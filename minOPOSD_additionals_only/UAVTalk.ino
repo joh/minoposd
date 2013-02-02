@@ -378,6 +378,10 @@ int uavtalk_read(void) {
         				osd_roll		= (int16_t) uavtalk_get_float(&msg, ATTITUDEACTUAL_OBJ_ROLL);
         				osd_pitch		= (int16_t) uavtalk_get_float(&msg, ATTITUDEACTUAL_OBJ_PITCH);
         				osd_yaw			= (int16_t) uavtalk_get_float(&msg, ATTITUDEACTUAL_OBJ_YAW);
+                                        // if we don't have a GPS, use Yaw for heading
+                                        if (osd_lat == 0) {
+                                            osd_heading = osd_yaw;
+                                        }
 				break;
 				case FLIGHTSTATUS_OBJID:
                                         response = UAVTALK_TYPE_ACK;
