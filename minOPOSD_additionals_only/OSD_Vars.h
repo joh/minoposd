@@ -64,7 +64,7 @@ static unsigned long text_timer = 0;
 static unsigned long warning_timer =0;
 
 static uint8_t      warning_type = 0;
-static uint8_t      last_warning = 0;
+static uint8_t      last_warning = 1;
 static uint8_t      warning = 0;
 static uint8_t      osd_off_switch = 0;
 static uint8_t      osd_switch_last = 100;
