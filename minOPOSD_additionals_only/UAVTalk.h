@@ -41,7 +41,15 @@
 
 // TODO enhancement:
 // Generate the following automatically out of the XML files.
+//
 // These object constants are version dependent!
+//
+// Short hints getting them manually:
+// http://wiki.openpilot.org/display/Doc/Windows%3A+Building+and+Packaging
+// git clone git://git.openpilot.org/OpenPilot.git OpenPilot
+// QT Creator > Datei oder Projekt öffnen... uavobjgenerator
+// generate release and copy exe to <top>\ground\uavobjgenerator
+// uavobjgenerator -flight ..\..\shared\uavobjectdefinition ..\..\
 
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2
 
