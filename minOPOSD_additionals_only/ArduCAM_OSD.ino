@@ -87,6 +87,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "FlightBatt.h"
 #endif
 
+// Amedee: Analog RSSI on MinimOSD:
+#ifdef ANALOG_RSSI_ON_MINIMOSD
+#include "AnalogRssi.h"
+#endif
+
 /* *************************************************/
 /* ***************** DEFINITIONS *******************/
 
@@ -179,6 +184,10 @@ void setup()
     PacketRxOk_init();
 #endif
 
+#ifdef ANALOG_RSSI_ON_MINIMOSD
+    analog_rssi_init();
+#endif
+
     // Startup MAVLink timers  
     mavlinkTimer.Set(&OnMavlinkTimer, 120);
 
@@ -208,6 +217,9 @@ void loop()
 // JRChange: Flight Batt on MinimOSD:
 #ifdef FLIGHT_BATT_ON_MINIMOSD
         flight_batt_read();
+#endif
+#ifdef ANALOG_RSSI_ON_MINIMOSD
+        analog_rssi_read();
 #endif
         OnMavlinkTimer();	// duration is up to approx. 10ms depending on choosen display features
     }

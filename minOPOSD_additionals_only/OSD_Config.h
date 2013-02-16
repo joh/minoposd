@@ -12,6 +12,8 @@
 #define FLIGHT_BATT_ON_MINIMOSD
 // JRChange: PacketRxOk on MinimOSD:
 #define PACKETRXOK_ON_MINIMOSD
+// Amedee: Analog RSSI on MinimOSD:
+// #define ANALOG_RSSI_ON_MINIMOSD
 // JRChange: JR specials
 //#define JR_SPECIALS
 
