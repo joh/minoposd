@@ -31,8 +31,9 @@
 #ifndef ANALOG_RSSI_H_
 #define ANALOG_RSSI_H_
 
-#define RSSI_PIN			24			// Any 'free' analog input will do -- ADC0-5 are available, 
-								// which are pins 23-28 on the ATmega328
+#define RSSI_PIN			1			// A1 is pin 24
+								// Any 'free' analog input will do -- A0-5 are available, 
+								// which are pins 23-28 on the ATmega328p
 
 #define REF_VOLTAGE			1.1			// INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
 
