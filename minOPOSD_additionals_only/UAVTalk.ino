@@ -433,7 +433,7 @@ int uavtalk_read(void) {
 				break;
 				case GPSVELOCITY_OBJID:
                                         response = UAVTALK_TYPE_ACK;
-					osd_climb		= uavtalk_get_float(&msg, GPSVELOCITY_OBJ_DOWN);		// TODO check algebraic sign
+					osd_climb		= -1.0 * uavtalk_get_float(&msg, GPSVELOCITY_OBJ_DOWN);
 				break;
 				case SYSTEMALARMS_OBJID:
                                         response = UAVTALK_TYPE_ACK;
