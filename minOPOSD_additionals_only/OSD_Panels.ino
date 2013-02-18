@@ -792,15 +792,22 @@ void panBatt_A(int first_col, int first_line){
 //------------------ Panel: Startup ArduCam OSD LOGO -------------------------------
 
 void panLogo(){
-    osd.setPanel(5, 5);
-    osd.openPanel();
 #ifdef PROTOCOL_UAVTALK
+    osd.setPanel(3, 5);
+    osd.openPanel();
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.2.0"));
+#ifdef PACKETRXOK_ON_MINIMOSD
+    osd.printf_P(PSTR(" PRxOk"));
+#endif
+#ifdef ANALOG_RSSI_ON_MINIMOSD
+    osd.printf_P(PSTR(" ARSSI"));
+#endif
 #ifdef JR_SPECIALS
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.1.0 JRS"));
-#else
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.1.0"));
+    osd.printf_P(PSTR(" JRS"));
 #endif
 #else
+    osd.setPanel(5, 5);
+    osd.openPanel();
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|MinimOSD Extra 2.1.1"));
 #endif
     osd.closePanel();
