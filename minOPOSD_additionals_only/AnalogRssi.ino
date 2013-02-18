@@ -5,7 +5,7 @@
  * @author     Philippe Vanhaesnedonck
  * @brief      Implements RSSI report on the Ardupilot Mega MinimOSD
  * 	       using built-in ADC reference.
-* @see        The GNU Public License (GPL) Version 3
+ * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
 /*
