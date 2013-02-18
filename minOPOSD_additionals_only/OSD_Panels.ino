@@ -16,6 +16,9 @@
 #define LOWEST_SETUP_MENU	2
 #define HIGHEST_SETUP_MENU	11
 
+#define MAX_WARNING		5	// change this if you add more warnings
+
+
 /******* STARTUP PANEL *******/
 
 void startPanels(){
@@ -529,22 +532,23 @@ void panWarn(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 
-    if (millis() > text_timer){ // if the text has been shown for a while
-        if (warning_type != 0) {
-            last_warning = warning_type; // save the warning type for cycling
-            warning_type = 0; // blank the text
+    if (millis() > text_timer){					// if the text or blank text has been shown for a while
+        if (warning_type != 0) {				// there was a warning, so we now blank it out 1s
+            last_warning = warning_type;			// save the warning type for cycling
+            warning_type = 0;					// blank the text
             warning = 1;
             warning_timer = millis();            
+	    text_timer = millis() + 1000;			// clear text 1 sec
         } else {
             if ((millis() - 10000) > warning_timer ) warning = 0;
 
-            int x = last_warning; // start the warning checks where we left it last time
-            while (warning_type == 0) { // cycle through the warning checks
+            int x = last_warning;				// start the warning checks where we left it last time
+            while (warning_type == 0) {				// cycle through the warning checks
                 x++;
-                if (x > 5) x = 1; // change the 6 if you add more warning types
+                if (x > MAX_WARNING) x = 1;
                 switch(x) {
                 case 1:
-                    if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
+                    if ((osd_fix_type) < 2) warning_type = 1;	// No GPS Fix
                     break;
 // JRChange: OpenPilot UAVTalk:
 #ifndef PROTOCOL_UAVTALK
@@ -555,7 +559,7 @@ void panWarn(int first_col, int first_line){
                     if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
                     break;
 #endif
-                case 4:
+                case 4:						// Bat warning
 // JRChange: OpenPilot UAVTalk:
 #ifdef PROTOCOL_UAVTALK
                     if (osd_vbat_A < battv/10.0) warning_type = 4;
@@ -563,7 +567,7 @@ void panWarn(int first_col, int first_line){
                     if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < batt_warn_level) warning_type = 4;
 #endif
                     break;
-                case 5:
+                case 5:						// RSSI warning
 // JRChange: PacketRxOk on MinimOSD:
 #ifdef PACKETRXOK_ON_MINIMOSD
 		    rssi = PacketRxOk_get();
@@ -571,11 +575,13 @@ void panWarn(int first_col, int first_line){
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = 5;
                     break;
                 }
-                if (x == last_warning) break; // if we've done a full cycle then there mustn't be any warnings
+                if (x == last_warning) break;			// we've done a full cycle
             }
+	    if (warning_type != 0) {
+		text_timer = millis() + 1000;			// show warning 1 sec if there is any
+	    }							// if not, we do not want the 1s delay, so a new error shows up immediately
         }
 
-        text_timer = millis() + 1000; // blink every 1 secs
         if (warning == 1){ 
             if (panel == 1) osd.clear();
             panel = 0; // turn OSD on if there is a warning                  
