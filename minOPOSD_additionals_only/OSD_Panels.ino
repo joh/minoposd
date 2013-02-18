@@ -543,12 +543,9 @@ void panWarn(int first_col, int first_line){
                 x++;
                 if (x > 5) x = 1; // change the 6 if you add more warning types
                 switch(x) {
-// JRChange: disabled for testing
-#if 0
                 case 1:
                     if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
                     break;
-#endif
 // JRChange: OpenPilot UAVTalk:
 #ifndef PROTOCOL_UAVTALK
                 case 2:
