@@ -66,10 +66,10 @@ void writePanels(){
                 if(ISb(panel,MavB_BIT)) panMavBeat(panMavBeat_XY[0][panel], panMavBeat_XY[1][panel]); //13x3
 #endif
 
-                if(osd_got_home == 1){
+                //if(osd_got_home == 1){
                     if(ISb(panel,HDis_BIT)) panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]); //13x3
                     if(ISb(panel,HDir_BIT)) panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]); //13x3
-                }
+                //}
 
                 if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
 #ifndef PROTOCOL_UAVTALK
