@@ -663,10 +663,10 @@ void panBatteryPercent(int first_col, int first_line){
 
 void panTime(int first_col, int first_line){
 // JRChange: JR specials
-#ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > 1A for the 1st time
+#ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > 2A for the 1st time
     static unsigned long engine_start_time = 0;
     
-    if (engine_start_time == 0 && osd_curr_A > 100) {
+    if (engine_start_time == 0 && osd_curr_A > 200) {
         engine_start_time = millis();
     }
     start_Time = (millis() - engine_start_time)/1000;
