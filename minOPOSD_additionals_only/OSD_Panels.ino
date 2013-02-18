@@ -13,6 +13,7 @@
 #endif
 
 // JRChange: Flight Batt on MinimOSD:
+#define LOWEST_SETUP_MENU	2
 #define HIGHEST_SETUP_MENU	11
 
 /******* STARTUP PANEL *******/
@@ -185,7 +186,7 @@ void panSetup(){
 
         if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu++;  //= setup_menu + 1;
         else if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu--;  //= setup_menu - 1;
-        if (setup_menu < 0) setup_menu = 0;
+        if (setup_menu < LOWEST_SETUP_MENU) setup_menu = LOWEST_SETUP_MENU;
         else if (setup_menu > HIGHEST_SETUP_MENU) setup_menu = HIGHEST_SETUP_MENU;	// JRChange: Flight Batt on MinimOSD:
 
         switch (setup_menu){
@@ -548,12 +549,15 @@ void panWarn(int first_col, int first_line){
                     if ((osd_fix_type) < 2) warning_type = 1; // No GPS Fix
                     break;
 #endif
+// JRChange: OpenPilot UAVTalk:
+#ifndef PROTOCOL_UAVTALK
                 case 2:
                     if (osd_airspeed * converts < stall && osd_airspeed > 1.12) warning_type = 2;
                     break;
                 case 3:
                     if ((osd_airspeed * converts) > (float)overspeed) warning_type = 3;
                     break;
+#endif
                 case 4:
 // JRChange: OpenPilot UAVTalk:
 #ifdef PROTOCOL_UAVTALK
