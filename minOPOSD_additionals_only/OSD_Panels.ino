@@ -68,15 +68,19 @@ void writePanels(){
                 }
 
                 if(ISb(panel,Time_BIT)) panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
+#ifndef PROTOCOL_UAVTALK
                 if(ISb(panel,WDir_BIT)) panWPDir(panWPDir_XY[0][panel], panWPDir_XY[1][panel]); //??x??
                 if(ISb(panel,WDis_BIT)) panWPDis(panWPDis_XY[0][panel], panWPDis_XY[1][panel]); //??x??
+#endif
 
                 //Testing bits from 8 bit register C 
                 //if(osd_got_home == 1){
                 if(ISc(panel,Alt_BIT)) panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]); //
                 if(ISc(panel,Halt_BIT)) panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]); //
                 if(ISc(panel,Vel_BIT)) panVel(panVel_XY[0][panel], panVel_XY[1][panel]); //
+#ifndef PROTOCOL_UAVTALK
                 if(ISc(panel,As_BIT)) panAirSpeed(panAirSpeed_XY[0][panel], panAirSpeed_XY[1][panel]); //
+#endif
 
                 //}
                 if(ISc(panel,Thr_BIT)) panThr(panThr_XY[0][panel], panThr_XY[1][panel]); //
@@ -86,7 +90,9 @@ void writePanels(){
 
                 //Testing bits from 8 bit register D 
                 //if(ISd(Off_BIT)) panOff(panOff_XY[0], panOff_XY[1]);
+#ifndef PROTOCOL_UAVTALK
                 if(ISd(panel,WindS_BIT)) panWindSpeed(panWindSpeed_XY[0][panel], panWindSpeed_XY[1][panel]);
+#endif
                 if(ISd(panel,Climb_BIT)) panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
 #ifndef PROTOCOL_UAVTALK
                 if(ISd(panel,Tune_BIT)) panTune(panTune_XY[0][panel], panTune_XY[1][panel]);
@@ -284,6 +290,7 @@ int change_val(int value, int address)
     return value;
 }
 
+#ifndef PROTOCOL_UAVTALK
 /* **************************************************************** */
 // Panel  : pan wind speed
 // Needs  : X, Y locations
@@ -301,6 +308,7 @@ void panWindSpeed(int first_col, int first_line){
 
     osd.closePanel();
 }
+#endif
 
 /* **************************************************************** */
 // Panel  : panOff
@@ -493,6 +501,7 @@ void panVel(int first_col, int first_line){
     osd.closePanel();
 }
 
+#ifndef PROTOCOL_UAVTALK
 /* **************************************************************** */
 // Panel  : panAirSpeed
 // Needs  : X, Y locations
@@ -506,6 +515,7 @@ void panAirSpeed(int first_col, int first_line){
     osd.printf("%c%3.0f%c", 0xE8, (double)(osd_airspeed * converts), spe);
     osd.closePanel();
 }
+#endif
 
 /* **************************************************************** */
 // Panel  : panWarn
@@ -936,6 +946,7 @@ void panMavBeat(int first_col, int first_line){
 }
 #endif
 
+#ifndef PROTOCOL_UAVTALK
 /* **************************************************************** */
 // Panel  : panWPDir
 // Needs  : X, Y locations
@@ -953,7 +964,9 @@ void panWPDir(int first_col, int first_line){
     showArrow((uint8_t)wp_target_bearing_rotate_int,0);
     osd.closePanel();
 }
+#endif
 
+#ifndef PROTOCOL_UAVTALK
 /* **************************************************************** */
 // Panel  : panWPDis
 // Needs  : X, Y locations
@@ -967,6 +980,7 @@ void panWPDis(int first_col, int first_line){
       osd.printf("%c%2i%c%4.0f%c",0x57,wp_number,0x0,(double)((float)(wp_dist) * converth),high);
     osd.closePanel();
 }
+#endif
 
 /* **************************************************************** */
 // Panel  : panHomeDir
