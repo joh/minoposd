@@ -599,6 +599,8 @@ void panWarn(int first_col, int first_line){
                 //osd.printf_P(PSTR("\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21"));
                 warning_string = "\x20\x4E\x6F\x20\x47\x50\x53\x20\x66\x69\x78\x21";
                 break;
+// JRChange: OpenPilot UAVTalk:
+#ifndef PROTOCOL_UAVTALK
             case 2:
                 //osd.printf_P(PSTR("\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20"));
                 warning_string = "\x20\x20\x20\x53\x74\x61\x6c\x6c\x21\x20\x20\x20";
@@ -607,6 +609,7 @@ void panWarn(int first_col, int first_line){
                 //osd.printf_P(PSTR("\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20"));
                 warning_string = "\x20\x4f\x76\x65\x72\x53\x70\x65\x65\x64\x21\x20";
                 break;
+#endif
             case 4:
                 //osd.printf_P(PSTR("\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21"));
                 warning_string = "\x42\x61\x74\x74\x65\x72\x79\x20\x4c\x6f\x77\x21";
@@ -858,7 +861,7 @@ void panGPSats(int first_col, int first_line){
     osd.openPanel();
     osd.printf("%c%2i", 0x0f,osd_satellites_visible);
 // JRChange: JR specials
-#ifdef JR_SPECIALS	// I use this place for GPS hour:minute
+#if 0 //def JR_SPECIALS	// I use this place for GPS hour:minute
     if (osd_time_hour + osd_time_minute > 0) {
         osd.printf("|%02i:%02i", osd_time_hour, osd_time_minute);
     }
@@ -1025,12 +1028,15 @@ void panFlightMode(int first_col, int first_line){
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL) mode_str = "vc ";	// VELOCITYCONTROL
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD   ) mode_str = "ph ";	// POSITIONHOLD
     osd.printf("%c%s", 0xE0, mode_str);
+// obsolete because of the 'DISARMED' warning
+#if 0
     if (osd_armed == 0 || osd_armed == 1) {	// unarmed
         osd.printf("-");
     }
     else if (osd_armed == 2) {			// armed
         osd.printf("+");
     }
+#endif
 #else
     //char c1 = 0xE0 ;//"; char c2; char c3; char c4; char c5; 
     char* mode_str="";
