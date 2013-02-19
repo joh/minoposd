@@ -417,7 +417,7 @@ int change_val(int value, int address)
 void panLogo(){
     osd.setPanel(3, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.2.0"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.2.1"));
 #ifdef PACKETRXOK_ON_MINIMOSD
     osd.printf_P(PSTR(" PRxOk"));
 #endif
