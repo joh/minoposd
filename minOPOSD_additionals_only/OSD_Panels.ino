@@ -36,7 +36,7 @@ TODO:
 #define PWM_HI			1800	// [us]	PWM high value
 #define PWM_OFFSET		100	// [us]	PWM offset for detecting stick movement
 
-#define SETUP_TIME		60000	// [ms]	the time after boot while we can enter the setup menu
+#define SETUP_TIME		30000	// [ms]	the time after boot while we can enter the setup menu
 #define SETUP_LOWEST_MENU	2	//	lowest shown setup menue item
 #ifndef FLIGHT_BATT_ON_MINIMOSD
 #define SETUP_HIGHEST_MENU	2	//	highest shown setup menue item
@@ -45,7 +45,7 @@ TODO:
 #endif
 
 #define WARN_FLASH_TIME		1000	// [ms]	the time with which the warnings are flashing
-#define WARN_RECOVER_TIME	10000	// [ms]	the time we stay in the first panel after last warning
+#define WARN_RECOVER_TIME	4000	// [ms]	the time we stay in the first panel after last warning
 #define WARN_MAX		3	//	the number of implemented warnings
 
 #define MODE_SWITCH_TIME	2000	// [ms]	the time for mode switching
