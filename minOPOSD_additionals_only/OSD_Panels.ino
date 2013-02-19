@@ -45,7 +45,7 @@ TODO:
 #endif
 
 #define WARN_FLASH_TIME		1000	// [ms]	the time with which the warnings are flashing
-#define WARN_RECOVER_TIME	1000	// [ms]	the time we stay in the first panel after last warning
+#define WARN_RECOVER_TIME	10000	// [ms]	the time we stay in the first panel after last warning
 #define WARN_MAX		3	//	the number of implemented warnings
 
 #define MODE_SWITCH_TIME	2000	// [ms]	the time for mode switching
