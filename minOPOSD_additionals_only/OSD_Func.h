@@ -45,6 +45,54 @@ char setBatteryPic(uint16_t bat_level)
 
 void setHomeVars(OSD &osd)
 {
+// JRChange: OpenPilot UAVTalk:
+#ifdef PROTOCOL_UAVTALK
+  float dstlon, dstlat;
+  long bearing;
+  
+  if (osd_got_home) {
+    // shrinking factor for longitude going to poles direction
+    float rads = fabs(osd_home_lat) * 0.0174532925;
+    double scaleLongDown = cos(rads);
+    double scaleLongUp   = 1.0f/cos(rads);
+
+    //DST to Home
+    dstlat = fabs(osd_home_lat - osd_lat) * 111319.5;
+    dstlon = fabs(osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
+    osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
+	  
+    //DIR to Home
+    dstlon = (osd_home_lon - osd_lon);					// OffSet X
+    dstlat = (osd_home_lat - osd_lat) * scaleLongUp;			// OffSet Y
+    bearing = 90 + (atan2(dstlat, -dstlon) * 57.295775);		// absolut home direction
+    if (bearing < 0) bearing += 360;					// normalization
+    bearing = bearing - 180;						// absolut return direction
+    if (bearing < 0) bearing += 360;					// normalization
+    bearing = bearing - osd_heading;					// relative home direction
+    if (bearing < 0) bearing += 360;					// normalization
+    osd_home_direction = round((float)(bearing/360.0f) * 16.0f) + 1;	// array of arrows
+    if (osd_home_direction > 16) osd_home_direction = 0;
+  } else {
+    // criteria for a stable home position:
+    //  - GPS fix
+    //  - with at least 5 satellites
+    //  - osd_alt stable for 30 * 100ms = 3s
+    //  - osd_alt stable means the delta is lower 0.5m
+    if (osd_fix_type > 1 && osd_satellites_visible >= 5 && osd_alt_cnt < 30) {
+      if (fabs(osd_alt_prev - osd_alt) > 0.5) {
+        osd_alt_cnt = 0;
+        osd_alt_prev = osd_alt;
+      } else {
+        if (++osd_alt_cnt >= 30) {
+          osd_home_lat = osd_lat;  	// take this osd_lat as osd_home_lat
+          osd_home_lon = osd_lon;  	// take this osd_lon as osd_home_lon
+          osd_home_alt = osd_alt;  	// take this stable osd_alt as osd_home_alt
+	  osd_got_home = 1;
+        }
+      }
+    }
+  }
+#else
   float dstlon, dstlat;
   long bearing;
   
@@ -55,26 +103,6 @@ void setHomeVars(OSD &osd)
     osd_got_home = 1;
   }
   else if(osd_got_home == 1){
-// JRChange: OpenPilot UAVTalk:
-#ifdef PROTOCOL_UAVTALK
-    // JRChange: osd_home_alt: new check for stable osd_alt
-    // must be stable for 30*100ms = 3s
-    // with at least 5 satellites
-    if(osd_alt_cnt < 30){
-      if(osd_satellites_visible < 5 || fabs(osd_alt_prev - osd_alt) > 0.5){
-        osd_alt_cnt = 0;
-        osd_alt_prev = osd_alt;
-      }
-      else
-      {
-        if(++osd_alt_cnt >= 30){
-          osd_home_lat = osd_lat;  // take this new osd_lat as osd_home_lat
-          osd_home_lon = osd_lon;  // take this new osd_lon as osd_home_lon
-          osd_home_alt = osd_alt;  // take this stable osd_alt as osd_home_alt
-        }
-      }
-    }
-#else
     // JRChange: osd_home_alt: check for stable osd_alt (must be stable for 25*120ms = 3s)
     if(osd_alt_cnt < 25){
       if(fabs(osd_alt_prev - osd_alt) > 0.5){
@@ -88,7 +116,6 @@ void setHomeVars(OSD &osd)
         }
       }
     }
-#endif
     // shrinking factor for longitude going to poles direction
     float rads = fabs(osd_home_lat) * 0.0174532925;
     double scaleLongDown = cos(rads);
@@ -112,6 +139,5 @@ void setHomeVars(OSD &osd)
     if(osd_home_direction > 16) osd_home_direction = 0;
 
   }
-
+#endif
 }
-
