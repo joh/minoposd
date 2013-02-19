@@ -32,17 +32,25 @@ TODO:
 #endif
 
 
-#define LOWEST_SETUP_MENU	2	// lowest shown setup menue item
+#define PWM_LO			1200	// [us]	PWM low value
+#define PWM_HI			1800	// [us]	PWM high value
+#define PWM_OFFSET		100	// [us]	PWM offset for detecting stick movement
 
+#define SETUP_TIME		60000	// [ms]	the time after boot while we can enter the setup menu
+#define SETUP_LOWEST_MENU	2	//	lowest shown setup menue item
 #ifndef FLIGHT_BATT_ON_MINIMOSD
-#define HIGHEST_SETUP_MENU	2	// highest shown setup menue item
+#define SETUP_HIGHEST_MENU	2	//	highest shown setup menue item
 #else
-#define HIGHEST_SETUP_MENU	11	// highest shown setup menue item
+#define SETUP_HIGHEST_MENU	11	//	highest shown setup menue item
 #endif
 
-#define MAX_WARNING		3	// change this if you add more warnings
+#define WARN_FLASH_TIME		1000	// [ms]	the time with which the warnings are flashing
+#define WARN_RECOVER_TIME	1000	// [ms]	the time we stay in the first panel after last warning
+#define WARN_MAX		3	//	the number of implemented warnings
 
+#define MODE_SWITCH_TIME	2000	// [ms]	the time for mode switching
 
+#define TIME_RESET_AMPERE	2	// [A]	the current above which the on time is set to 00:00
 
 
 /******* STARTUP PANEL *******/
@@ -116,7 +124,7 @@ void writePanels() {
     // OSD debug for development
     osd.setPanel(13,4);
     osd.openPanel();
-    osd.printf("%i",freeMem()); 
+    osd.printf("%i", freeMem()); 
     osd.closePanel();
 #endif
 }
@@ -140,14 +148,14 @@ void panWarn(int first_col, int first_line) {
             warning_type = 0;					// blank the text
             warning = 1;
             warning_timer = millis();            
-	    text_timer = millis() + 1000;			// clear text 1 sec
+	    text_timer = millis() + WARN_FLASH_TIME;		// clear text
         } else {
-            if ((millis() - 10000) > warning_timer ) warning = 0;
+            if ((millis() - WARN_RECOVER_TIME) > warning_timer ) warning = 0;
 
             x = last_warning;					// start the warning checks where we left it last time
             while (warning_type == 0) {				// cycle through the warning checks
                 x++;
-                if (x > MAX_WARNING) x = 1;
+                if (x > WARN_MAX) x = 1;
                 switch (x) {
                 case 1:						// NO GPS FIX
 								// to allow flying in the woods (what I really like) without this annoying warning, 
@@ -171,7 +179,7 @@ void panWarn(int first_col, int first_line) {
                 if (x == last_warning) break;			// we've done a full cycle
             }
 	    if (warning_type != 0) {
-		text_timer = millis() + 1000;			// show warning 1 sec if there is any
+		text_timer = millis() + WARN_FLASH_TIME;	// show warning if there is any
 	    }							// if not, we do not want the 1s delay, so a new error shows up immediately
         }
 	
@@ -225,7 +233,7 @@ void panOff(){
                     switch (panel) {
 			case 0:
                             panel = 1;                                                        
-                            if (millis() <= 60000) {
+                            if (millis() <= SETUP_TIME) {
                                 osd_set = 1;
                             } else {
                                 osd_set = 0;
@@ -242,7 +250,7 @@ void panOff(){
                     osd.clear();
                 }
             }
-            if ((millis() - osd_switch_time) > 2000) {
+            if ((millis() - osd_switch_time) > MODE_SWITCH_TIME) {
                 osd_switch_last = osd_mode;
             }
         }
@@ -254,8 +262,8 @@ void panOff(){
         else if (ch_toggle == 8) ch_raw = osd_chan8_raw;
 
         if (switch_mode == 0) {
-            if (ch_raw > 1800) {
-                if (millis() <= 60000) {
+            if (ch_raw > PWM_HI) {
+                if (millis() <= SETUP_TIME) {
                     osd_set = 1;
                 }
                 else if (osd_set != 1 && warning != 1) {
@@ -263,26 +271,26 @@ void panOff(){
                 }
                 panel = npanels; //off panel
             }
-            else if (ch_raw < 1200 && panel != 0) {								// first panel
+            else if (ch_raw < PWM_LO && panel != 0) {								// first panel
                 osd_set = 0;
                 osd.clear();
                 panel = 0;
             }
-            else if (ch_raw >= 1200 && ch_raw <= 1800 && setup_menu != 6 && panel != 1 && warning != 1) {	// second panel
+            else if (ch_raw >= PWM_LO && ch_raw <= PWM_HI && setup_menu != 6 && panel != 1 && warning != 1) {	// second panel
                 osd_set = 0;
                 osd.clear();
                 panel = 1;
             }        
         } else {
 
-            if (ch_raw > 1200)
-                if (millis() <= 60000 && osd_set != 1) {
-                    if (osd_switch_time + 1000 < millis()) {
+            if (ch_raw > PWM_LO)
+                if (millis() <= SETUP_TIME && osd_set != 1) {
+                    if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
                         osd_set = 1;
                         osd_switch_time = millis();
                     }
                 } else {
-                    if (osd_switch_time + 1000 < millis()) {
+                    if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
                         osd_set = 0;
                         osd.clear();
                         if (panel == npanels) {
@@ -309,7 +317,7 @@ void panSetup() {
     int delta = 100;
 
     if (millis() > text_timer) {
-        text_timer = millis() + 500;
+        text_timer = millis() + WARN_FLASH_TIME / 2;
 
         osd.clear();
         osd.setPanel(5, 3);
@@ -322,10 +330,11 @@ void panSetup() {
             chan2_raw_middle = chan2_raw;
         }
 
-        if ((chan2_raw - 100) > chan2_raw_middle ) setup_menu++;
-        else if ((chan2_raw + 100) < chan2_raw_middle ) setup_menu--;
-        if (setup_menu < LOWEST_SETUP_MENU) setup_menu = LOWEST_SETUP_MENU;
-        else if (setup_menu > HIGHEST_SETUP_MENU) setup_menu = HIGHEST_SETUP_MENU;
+        if ((chan2_raw - PWM_OFFSET) > chan2_raw_middle ) setup_menu++;
+        else if ((chan2_raw + PWM_OFFSET) < chan2_raw_middle ) setup_menu--;
+	
+        if (setup_menu < SETUP_LOWEST_MENU) setup_menu = SETUP_LOWEST_MENU;
+        else if (setup_menu > SETUP_HIGHEST_MENU) setup_menu = SETUP_HIGHEST_MENU;
 
         switch (setup_menu) {
             case 2:
@@ -340,7 +349,7 @@ void panSetup() {
 		delta /= 10;
             case 3:
 		// volt_div_ratio
-                osd.printf_P(PSTR("Calibrate|measured volt: "));
+                osd.printf_P(PSTR("Calibrate||measured volt: "));
                 osd.printf("%c%5.2f%c", 0xE2, (float)osd_vbat_A, 0x8E);
                 osd.printf("||volt div ratio:  %5i", volt_div_ratio);
                 volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR, delta);
@@ -351,7 +360,7 @@ void panSetup() {
 		delta /= 10;
             case 6:
 		// curr_amp_offset
-                osd.printf_P(PSTR("Calibrate|measured amp:  "));
+                osd.printf_P(PSTR("Calibrate||measured amp:  "));
                 osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
                 osd.printf("||amp offset:      %5i", curr_amp_offset);
                 curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR, delta);
@@ -362,7 +371,7 @@ void panSetup() {
 		delta /= 10;
             case 9:
 		// curr_amp_per_volt
-                osd.printf_P(PSTR("Calibrate|measured amp:  "));
+                osd.printf_P(PSTR("Calibrate||measured amp:  "));
                 osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
                 osd.printf("||amp per volt:    %5i", curr_amp_per_volt);
                 curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR, delta);
@@ -391,8 +400,8 @@ int change_int_val(int value, int address, int delta)
 	break;
     }
 		
-    if (chan1_raw > chan1_raw_middle + 100) value -= delta;
-    if (chan1_raw < chan1_raw_middle - 100) value += delta;
+    if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value -= delta;
+    else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value += delta;
 
     if (value != value_old && osd_set) {
 	EEPROM.write(address, value&0xff);
@@ -405,8 +414,9 @@ int change_int_val(int value, int address, int delta)
 int change_val(int value, int address)
 {
     uint8_t value_old = value;
-    if (chan1_raw > chan1_raw_middle + 100) value--;
-    if (chan1_raw  < chan1_raw_middle - 100) value++;
+    
+    if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value--;
+    else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value++;
 
     if (value != value_old && osd_set) EEPROM.write(address, value);
     return value;
@@ -433,7 +443,6 @@ void panLogo(){
 
 //------------------ Panel: Waiting for UAVTalk comm -------------------------------
 void panWaitCom(int first_col, int first_line){
-//    panLogo();		// this is useless if we lost communication in flight
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf_P(PSTR("Waiting for|UAVTalk comm . . . . "));
@@ -501,7 +510,7 @@ void panGPS(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 #ifdef JR_SPECIALS	// I like it more one row style
-    osd.printf("%c%11.6f    %c%11.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
+    osd.printf("%c%10.6f     %c%10.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
 #else
     osd.printf("%c%11.6f|%c%11.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
 #endif
@@ -530,7 +539,7 @@ void panHomeDis(int first_col, int first_line){
 void panHomeDir(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    showArrow((uint8_t)osd_home_direction, 0);
+    showArrow((uint8_t)osd_home_direction);
     osd.closePanel();
 }
 
@@ -747,10 +756,10 @@ void panBatteryPercent(int first_col, int first_line){
 // Output : Time from bootup or start
 /******************************************************************/
 void panTime(int first_col, int first_line){
-#ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > 2A for the 1st time
+#ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > TIME_RESET_AMPERE for the 1st time
     static unsigned long engine_start_time = 0;
     
-    if (engine_start_time == 0 && osd_curr_A > 200) {
+    if (engine_start_time == 0 && osd_curr_A > TIME_RESET_AMPERE * 100) {
         engine_start_time = millis();
     }
     start_Time = (millis() - engine_start_time)/1000;
@@ -832,7 +841,7 @@ void panOtherUAV(int first_col, int first_line){
     osd.openPanel();
     osd.printf("D%4.0f%c|", (double)((float)(oUAV_distance) * converth), high);
     osd.printf("A%4.0f%c|  ", (double)((oUAV_alt - osd_alt) * converth), high);
-    showArrow((uint8_t)oUAV_direction,0);
+    showArrow((uint8_t)oUAV_direction);
     osd.closePanel();
 }
 #endif
@@ -843,7 +852,7 @@ void panOtherUAV(int first_col, int first_line){
 // ---------------- EXTRA FUNCTIONS ----------------------
 
 // Show those fancy 2 char arrows
-void showArrow(uint8_t rotate_arrow,uint8_t method) {  
+void showArrow(uint8_t rotate_arrow) {  
     char arrow_set1 = 0x0;
     char arrow_set2 = 0x0;   
     switch (rotate_arrow) {
@@ -916,8 +925,7 @@ void showArrow(uint8_t rotate_arrow,uint8_t method) {
         arrow_set2 = 0xAF;
         break;
     } 
-    if (method == 1) osd.printf("%c%3.0f%c|%c%c", 0xFC, (double)(osd_windspeed * converts), spe, arrow_set1, arrow_set2);
-    else osd.printf("%c%c", arrow_set1, arrow_set2);
+    osd.printf("%c%c", arrow_set1, arrow_set2);
 }
 
 
@@ -935,8 +943,8 @@ void showHorizon(int start_col, int start_row) {
 
     nose = round(tan(pitch) * (rows * 9));
     for (int col=1; col<=cols; col++) {
-        x = (col * 12) - (cols * 6) - 6;				//center X point at middle of each col
-        col_hit[col-1] = (tan(roll) * x) + nose + (rows*9) - 1;		//calculating hit point on Y plus offset to eliminate negative values
+        x = (col * 12) - (cols * 6) - 6;				// center X point at middle of each col
+        col_hit[col-1] = (tan(roll) * x) + nose + (rows*9) - 1;		// calculating hit point on Y plus offset to eliminate negative values
     }
 
     for (int col=0; col<cols; col++) {
