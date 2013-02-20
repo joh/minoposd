@@ -8,16 +8,17 @@ refactoring started
 there is more refactoring necessary because there are too much side effects
 
 TODO:
+
 	refactor:
+		writePanels
+		switchPanels
 		panWarn
-		panOff
 		panSetup
-		
-	renaming:
-		waitingMAVBeats
-		
-	maybe port panCallsign
 	
+	implement usage of pal_ntsc
+	
+	maybe implement usage of panCallsign
+
 */
 
 
@@ -53,8 +54,29 @@ TODO:
 #define TIME_RESET_AMPERE	2	// [A]	the current above which the on time is set to 00:00
 
 
-/******* STARTUP PANEL *******/
 
+
+static float		convert_speed = 0;
+static float		convert_length = 0;
+static uint8_t		unit_speed = 0;
+static uint8_t		unit_length = 0;
+
+
+// TODO: refactor:
+static boolean		setup_menu_active = 0;
+static boolean		warning_active = 0;
+static unsigned long	text_timer = 0;
+
+
+
+
+/******* MAIN FUNCTIONS *******/
+
+
+/******************************************************************/
+// Panel  : startPanels
+// Output : Logo panel and initialization
+/******************************************************************/
 void startPanels() {
     osd.clear();
     panLogo();		// display logo  
@@ -62,16 +84,19 @@ void startPanels() {
 }
 
 
-/******* PANELS - POSITION *******/
-
+/******************************************************************/
+// Panel  : writePanels
+// Output : Write the panels or do other things
+// TODO   : REFACTOR
+/******************************************************************/
 void writePanels() {
     if (uavtalk_state() == TELEMETRYSTATS_STATE_CONNECTED) {
-        if (waitingMAVBeats == 1) {
+        if (waitingTelemetry == 1) {
             osd.clear();
-	    waitingMAVBeats = 0;
+	    waitingTelemetry = 0;
         }
-        if (ch_toggle > 3) panOff();										// This must be first so you can always toggle
-        if (osd_set == 0) {											// setup panel is called in the else at the end
+        if (ch_toggle > 3) switchPanels();									// This must be first so you can always switch the panel
+        if (!setup_menu_active) {										// setup panel is called in the else at the end
             if (panel != npanels) {
                 if (ISd(panel,Warn_BIT))	panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]);		// this must be here so warnings are always checked
 		
@@ -113,10 +138,10 @@ void writePanels() {
             panSetup();
         }
     } else {													// no telemetry communication
-        if (waitingMAVBeats == 0) {
+        if (waitingTelemetry == 0) {
             osd.clear();
         }
-        waitingMAVBeats = 1;
+        waitingTelemetry = 1;
         panWaitCom(5,10);
     }
 
@@ -130,29 +155,127 @@ void writePanels() {
 }
 
 
-/******* PANELS - SPECIALS *******/
+/******************************************************************/
+// Panel  : switchPanels
+// Output : Switch between panels
+// TODO   : REFACTOR
+/******************************************************************/
+void switchPanels() {
+    static uint8_t      	osd_off_switch = 0;
+    static uint8_t      	osd_switch_last = 100;
+    static unsigned long	osd_switch_time = 0;
+
+    if (ch_toggle == 4) {
+        if ((osd_mode != FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE) && (osd_mode != FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD)) {
+            if (osd_off_switch != osd_mode) { 
+                osd_off_switch = osd_mode;
+                osd_switch_time = millis();
+
+                if (osd_off_switch == osd_switch_last) {
+                    switch (panel) {
+			case 0:
+                            panel = 1;                                                        
+                            if (millis() <= SETUP_TIME) {
+                                setup_menu_active = 1;
+                            } else {
+                                setup_menu_active = 0;
+                            }                            
+                           break;
+			case 1:
+                            panel = npanels;
+                            setup_menu_active = 0;                            
+                           break;
+			case npanels:
+                            panel = 0;
+                            break;
+                    }
+                    osd.clear();
+                }
+            }
+            if ((millis() - osd_switch_time) > MODE_SWITCH_TIME) {
+                osd_switch_last = osd_mode;
+            }
+        }
+    }
+    else {
+        if (ch_toggle == 5) ch_raw = osd_chan5_raw;
+        else if (ch_toggle == 6) ch_raw = osd_chan6_raw;
+        else if (ch_toggle == 7) ch_raw = osd_chan7_raw;
+        else if (ch_toggle == 8) ch_raw = osd_chan8_raw;
+
+        if (switch_mode == 0) {
+            if (ch_raw > PWM_HI) {
+                if (millis() <= SETUP_TIME) {
+                    setup_menu_active = 1;
+                }
+                else if (!setup_menu_active && !warning_active) {
+                    osd.clear();
+                }
+                panel = npanels;				// off panel
+            }
+            else if (ch_raw < PWM_LO && panel != 0) {
+                setup_menu_active = 0;
+                osd.clear();
+                panel = 0;					// first panel
+            }
+            else if (ch_raw >= PWM_LO && ch_raw <= PWM_HI && panel != 1 && !warning_active) {
+                setup_menu_active = 0;
+                osd.clear();
+                panel = 1;					// second panel
+            }        
+        } else {
+            if (ch_raw > PWM_LO) {
+                if (millis() <= SETUP_TIME && !setup_menu_active) {
+                    if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
+                        setup_menu_active = 1;
+                        osd_switch_time = millis();
+                    }
+                } else {
+                    if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
+                        setup_menu_active = 0;
+                        osd.clear();
+                        if (panel == npanels) {
+                            panel = 0;
+                        } else {
+                            panel++;
+                        }
+                        if (panel > 1) panel = npanels;
+                        osd_switch_time = millis();
+                    }
+                }
+	    }
+        }    
+    }
+}
+
+
+/******* SPECIAL PANELS *******/
+
 
 /******************************************************************/
 // Panel  : panWarn
 // Needs  : X, Y locations
-// Output : 
+// Output : Warnings if there are any
 // TODO   : REFACTOR
 /******************************************************************/
 void panWarn(int first_col, int first_line) {
+    static uint8_t last_warning_type = 1;
+    static uint8_t warning_type = 0;
+    static unsigned long warning_timer = 0;
+    
     char* warning_string;
     int x;
 
     if (millis() > text_timer) {				// if the text or blank text has been shown for a while
         if (warning_type != 0) {				// there was a warning, so we now blank it out 1s
-            last_warning = warning_type;			// save the warning type for cycling
+            last_warning_type = warning_type;			// save the warning type for cycling
             warning_type = 0;					// blank the text
-            warning = 1;
+            warning_active = 1;
             warning_timer = millis();            
 	    text_timer = millis() + WARN_FLASH_TIME;		// clear text
         } else {
-            if ((millis() - WARN_RECOVER_TIME) > warning_timer ) warning = 0;
-
-            x = last_warning;					// start the warning checks where we left it last time
+            if ((millis() - WARN_RECOVER_TIME) > warning_timer ) warning_active = 0;
+            x = last_warning_type;				// start the warning checks where we left it last time
             while (warning_type == 0) {				// cycle through the warning checks
                 x++;
                 if (x > WARN_MAX) x = 1;
@@ -176,7 +299,7 @@ void panWarn(int first_col, int first_line) {
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = x;
                     break;
                 }
-                if (x == last_warning) break;			// we've done a full cycle
+                if (x == last_warning_type) break;		// we've done a full cycle
             }
 	    if (warning_type != 0) {
 		text_timer = millis() + WARN_FLASH_TIME;	// show warning if there is any
@@ -205,104 +328,13 @@ void panWarn(int first_col, int first_line) {
 	osd.setPanel(first_col, first_line);
 	osd.openPanel();
 	
-        if (warning == 1) { 
-            if (panel == 1) osd.clear();
+        if (warning_active) {
+            if (panel >= 1) osd.clear();
             panel = 0;						// switch to first panel if there is a warning                  
         }
 	
         osd.printf("%s", warning_string);
 	osd.closePanel();
-    }
-}
-
-
-/******************************************************************/
-// Panel  : panOff
-// Needs  : X, Y locations
-// Output : OSD off
-// TODO   : REFACTOR
-/******************************************************************/
-void panOff(){
-    if (ch_toggle == 4) {
-        if ((osd_mode != FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE) && (osd_mode != FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD)) {
-            if (osd_off_switch != osd_mode) { 
-                osd_off_switch = osd_mode;
-                osd_switch_time = millis();
-
-                if (osd_off_switch == osd_switch_last) {
-                    switch (panel) {
-			case 0:
-                            panel = 1;                                                        
-                            if (millis() <= SETUP_TIME) {
-                                osd_set = 1;
-                            } else {
-                                osd_set = 0;
-                            }                            
-                           break;
-			case 1:
-                            panel = npanels;
-                            osd_set = 0;                            
-                           break;
-			case npanels:
-                            panel = 0;
-                            break;
-                    }
-                    osd.clear();
-                }
-            }
-            if ((millis() - osd_switch_time) > MODE_SWITCH_TIME) {
-                osd_switch_last = osd_mode;
-            }
-        }
-    }
-    else {
-        if (ch_toggle == 5) ch_raw = osd_chan5_raw;
-        else if (ch_toggle == 6) ch_raw = osd_chan6_raw;
-        else if (ch_toggle == 7) ch_raw = osd_chan7_raw;
-        else if (ch_toggle == 8) ch_raw = osd_chan8_raw;
-
-        if (switch_mode == 0) {
-            if (ch_raw > PWM_HI) {
-                if (millis() <= SETUP_TIME) {
-                    osd_set = 1;
-                }
-                else if (osd_set != 1 && warning != 1) {
-                    osd.clear();
-                }
-                panel = npanels; //off panel
-            }
-            else if (ch_raw < PWM_LO && panel != 0) {								// first panel
-                osd_set = 0;
-                osd.clear();
-                panel = 0;
-            }
-            else if (ch_raw >= PWM_LO && ch_raw <= PWM_HI && setup_menu != 6 && panel != 1 && warning != 1) {	// second panel
-                osd_set = 0;
-                osd.clear();
-                panel = 1;
-            }        
-        } else {
-
-            if (ch_raw > PWM_LO)
-                if (millis() <= SETUP_TIME && osd_set != 1) {
-                    if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
-                        osd_set = 1;
-                        osd_switch_time = millis();
-                    }
-                } else {
-                    if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
-                        osd_set = 0;
-                        osd.clear();
-                        if (panel == npanels) {
-                            panel = 0;
-                        } else {
-                            panel++;
-                        }
-                        if (panel > 1) panel = npanels;
-                        osd_switch_time = millis();
-                    }
-                }
-        }    
     }
 }
 
@@ -314,6 +346,8 @@ void panOff(){
 // TODO   : REFACTOR
 /******************************************************************/
 void panSetup() {
+    static int8_t setup_menu = 0;
+
     int delta = 100;
 
     if (millis() > text_timer) {
@@ -383,48 +417,28 @@ void panSetup() {
 }
 
 
-int change_int_val(int value, int address, int delta)
-{
-    int value_old = value;
-    
-    osd.printf( "|                   ");
-    switch (delta) {
-        case 100:
-            osd.printf_P(PSTR("\x5E"));
-	break;
-        case 10:
-            osd.printf_P(PSTR(" \x5E"));
-	break;
-        case 1:
-            osd.printf_P(PSTR("  \x5E"));
-	break;
-    }
-		
-    if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value -= delta;
-    else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value += delta;
+/******* PANELS *******/
 
-    if (value != value_old && osd_set) {
-	EEPROM.write(address, value&0xff);
-	EEPROM.write(address+1, (value>>8)&0xff);
-    }
-    return value;
+
+/******************************************************************/
+// Panel  : panBoot
+// Needs  : X, Y locations
+// Output : Booting up text and empty bar after that
+/******************************************************************/
+void panBoot(int first_col, int first_line) {
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    osd.printf_P(PSTR("Booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3")); 
+    osd.closePanel();
 }
 
 
-int change_val(int value, int address)
-{
-    uint8_t value_old = value;
-    
-    if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value--;
-    else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value++;
-
-    if (value != value_old && osd_set) EEPROM.write(address, value);
-    return value;
-}
-
-
-//------------------ Panel: Startup OSD LOGO -------------------------------
-void panLogo(){
+/******************************************************************/
+// Panel  : panLogo
+// Needs  : X, Y locations
+// Output : Startup OSD LOGO
+/******************************************************************/
+void panLogo() {
     osd.setPanel(3, 5);
     osd.openPanel();
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.2.1"));
@@ -441,29 +455,15 @@ void panLogo(){
 }
 
 
-//------------------ Panel: Waiting for UAVTalk comm -------------------------------
-void panWaitCom(int first_col, int first_line){
+/******************************************************************/
+// Panel  : panWaitCom
+// Needs  : X, Y locations
+// Output : Waiting for UAVTalk comm
+/******************************************************************/
+void panWaitCom(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf_P(PSTR("Waiting for|UAVTalk comm . . . . "));
-    osd.closePanel();
-}
-
-
-
-
-/******* PANELS - DEFINITION *******/
-
-
-/******************************************************************/
-// Panel  : panBoot
-// Needs  : X, Y locations
-// Output : Booting up text and empty bar after that
-/******************************************************************/
-void panBoot(int first_col, int first_line){
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    osd.printf_P(PSTR("Booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3")); 
     osd.closePanel();
 }
 
@@ -473,7 +473,7 @@ void panBoot(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : 1 symbol and number of locked satellites
 /******************************************************************/
-void panGPSats(int first_col, int first_line){
+void panGPSats(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%c%2i", 0x0f, osd_satellites_visible);
@@ -486,7 +486,7 @@ void panGPSats(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : 1 static symbol with changing FIX symbol
 /******************************************************************/
-void panGPL(int first_col, int first_line){
+void panGPL(int first_col, int first_line) {
     char* gps_str;
     
     osd.setPanel(first_col, first_line);
@@ -506,7 +506,7 @@ void panGPL(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : two row numeric value of current GPS location with LAT/LON symbols
 /******************************************************************/
-void panGPS(int first_col, int first_line){
+void panGPS(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 #ifdef JR_SPECIALS	// I like it more one row style
@@ -523,10 +523,10 @@ void panGPS(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Distance to home
 /******************************************************************/
-void panHomeDis(int first_col, int first_line){
+void panHomeDis(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.0f%c", 0x1F, (double)((osd_home_distance) * converth), high);
+    osd.printf("%c%5.0f%c", 0x1F, (double)((osd_home_distance) * convert_length), unit_length);
     osd.closePanel();
 }
 
@@ -536,7 +536,7 @@ void panHomeDis(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : 2 symbols that are combined as one arrow, shows direction to home
 /******************************************************************/
-void panHomeDir(int first_col, int first_line){
+void panHomeDir(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     showArrow((uint8_t)osd_home_direction);
@@ -549,10 +549,10 @@ void panHomeDir(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Hom altidude
 /******************************************************************/
-void panHomeAlt(int first_col, int first_line){
+void panHomeAlt(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.0f%c", 0xE7, (double)((osd_alt - osd_home_alt) * converth), high);
+    osd.printf("%c%5.0f%c", 0xE7, (double)((osd_alt - osd_home_alt) * convert_length), unit_length);
     osd.closePanel();
 }
 
@@ -562,10 +562,10 @@ void panHomeAlt(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Altidude
 /******************************************************************/
-void panAlt(int first_col, int first_line){
+void panAlt(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.0f%c",0xE6, (double)(osd_alt * converth), high);
+    osd.printf("%c%5.0f%c",0xE6, (double)(osd_alt * convert_length), unit_length);
     osd.closePanel();
 }
 
@@ -575,10 +575,10 @@ void panAlt(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Velocity 
 /******************************************************************/
-void panVel(int first_col, int first_line){
+void panVel(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%3.0f%c", 0xE9, (double)(osd_groundspeed * converts), spe);
+    osd.printf("%c%3.0f%c", 0xE9, (double)(osd_groundspeed * convert_speed), unit_speed);
     osd.closePanel();
 }
 
@@ -588,7 +588,7 @@ void panVel(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Climb Rate
 /******************************************************************/
-void panClimb(int first_col, int first_line){
+void panClimb(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%c%3.0f%c", 0x16, (double)(osd_climb), 0x88);
@@ -601,7 +601,7 @@ void panClimb(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Symbols with numeric compass heading value
 /******************************************************************/
-void panHeading(int first_col, int first_line){
+void panHeading(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%4.0f%c", (double)osd_heading, 0xb0);
@@ -614,7 +614,7 @@ void panHeading(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : a dynamic compass rose that changes along the heading information
 /******************************************************************/
-void panRose(int first_col, int first_line){
+void panRose(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     //osd_heading  = osd_yaw;
@@ -649,7 +649,7 @@ void panRSSI(int first_col, int first_line) {
 // Needs  : X, Y locations
 // Output : -+ value of current Roll from vehicle with degree symbols and roll symbol
 /******************************************************************/
-void panRoll(int first_col, int first_line){
+void panRoll(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%4i%c%c", osd_roll, 0xb0, 0xb2);
@@ -662,7 +662,7 @@ void panRoll(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : -+ value of current Pitch from vehicle with degree symbols and pitch symbol
 /******************************************************************/
-void panPitch(int first_col, int first_line){
+void panPitch(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%4i%c%c", osd_pitch, 0xb0, 0xb1);
@@ -675,7 +675,7 @@ void panPitch(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Throttle 
 /******************************************************************/
-void panThr(int first_col, int first_line){
+void panThr(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%c%3.0i%c", 0x87, osd_throttle, 0x25);
@@ -688,7 +688,7 @@ void panThr(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : current flight modes
 /******************************************************************/
-void panFlightMode(int first_col, int first_line){
+void panFlightMode(int first_col, int first_line) {
     char* mode_str="";
     
     osd.setPanel(first_col, first_line);
@@ -711,7 +711,7 @@ void panFlightMode(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Voltage value as in XX.X and symbol of over all battery status
 /******************************************************************/
-void panBatt_A(int first_col, int first_line){
+void panBatt_A(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%c%5.2f%c", 0xE2, (double)osd_vbat_A, 0x8E);
@@ -724,7 +724,7 @@ void panBatt_A(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Current
 /******************************************************************/
-void panCur_A(int first_col, int first_line){
+void panCur_A(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf("%c%5.2f%c", 0xE4, osd_curr_A * .01, 0x8F);
@@ -738,7 +738,7 @@ void panCur_A(int first_col, int first_line){
 // Output : Battery
 //          (if defined FLIGHT_BATT_ON_MINIMOSD then not percent but consumed mAh)
 /******************************************************************/
-void panBatteryPercent(int first_col, int first_line){
+void panBatteryPercent(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 #ifdef FLIGHT_BATT_ON_MINIMOSD
@@ -755,7 +755,7 @@ void panBatteryPercent(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : Time from bootup or start
 /******************************************************************/
-void panTime(int first_col, int first_line){
+void panTime(int first_col, int first_line) {
 #ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > TIME_RESET_AMPERE for the 1st time
     static unsigned long engine_start_time = 0;
     
@@ -783,7 +783,7 @@ void panTime(int first_col, int first_line){
 // Needs  : X, Y locations
 // Output : artificial horizon
 /******************************************************************/
-void panHorizon(int first_col, int first_line){
+void panHorizon(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
@@ -809,7 +809,7 @@ void panHorizon(int first_col, int first_line){
 //          not ready
 // ToDo   : refactor with function setHomeVars
 /******************************************************************/
-void panOtherUAV(int first_col, int first_line){
+void panOtherUAV(int first_col, int first_line) {
     float dstlon, dstlat;
     long oUAV_distance;
     long oUAV_bearing;
@@ -839,17 +839,56 @@ void panOtherUAV(int first_col, int first_line){
     
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("D%4.0f%c|", (double)((float)(oUAV_distance) * converth), high);
-    osd.printf("A%4.0f%c|  ", (double)((oUAV_alt - osd_alt) * converth), high);
+    osd.printf("D%4.0f%c|", (double)((float)(oUAV_distance) * convert_length), unit_length);
+    osd.printf("A%4.0f%c|  ", (double)((oUAV_alt - osd_alt) * convert_length), unit_length);
     showArrow((uint8_t)oUAV_direction);
     osd.closePanel();
 }
 #endif
 
 
+/******* HELPER FUNCTIONS *******/
 
 
-// ---------------- EXTRA FUNCTIONS ----------------------
+// Setup change function
+int change_int_val(int value, int address, int delta) {
+    int value_old = value;
+    
+    osd.printf_P(PSTR("|                   "));
+    switch (delta) {
+        case 100:
+            osd.printf_P(PSTR("\x5E"));
+	break;
+        case 10:
+            osd.printf_P(PSTR(" \x5E"));
+	break;
+        case 1:
+            osd.printf_P(PSTR("  \x5E"));
+	break;
+    }
+		
+    if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value -= delta;
+    else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value += delta;
+
+    if (value != value_old && setup_menu_active) {
+	EEPROM.write(address, value&0xff);
+	EEPROM.write(address+1, (value>>8)&0xff);
+    }
+    return value;
+}
+
+
+// Setup change function
+int change_val(int value, int address) {
+    uint8_t value_old = value;
+    
+    if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value--;
+    else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value++;
+
+    if (value != value_old && setup_menu_active) EEPROM.write(address, value);
+    return value;
+}
+
 
 // Show those fancy 2 char arrows
 void showArrow(uint8_t rotate_arrow) {  
@@ -999,14 +1038,14 @@ void printHit(byte col, byte row, byte subval) {
 
 void set_converts() {
     if (EEPROM.read(measure_ADDR) == 0) {
-        converts = 3.6;
-        converth = 1.0;
-        spe = 0x81;
-        high = 0x8D;
+        convert_speed = 3.6;
+        convert_length = 1.0;
+        unit_speed = 0x81;
+        unit_length = 0x8D;
     } else {
-        converts = 2.23;
-        converth = 3.28;
-        spe = 0xfb;
-        high = 0x66;
+        convert_speed = 2.23;
+        convert_length = 3.28;
+        unit_speed = 0xfb;
+        unit_length = 0x66;
     }
 }

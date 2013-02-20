@@ -1,3 +1,49 @@
+//
+//
+//
+
+//
+// some more refactoring has to be done...
+//
+// hints for done and future refactoring
+//
+// converts			changed to static variable in OSD_Vars.ino
+//				renamed to:		convert_speed
+// converth			changed to static variable in OSD_Vars.ino
+//				renamed to:		convert_length
+// spe				changed to static variable in OSD_Vars.ino
+//				renamed to:		unit_speed
+// high				changed to static variable in OSD_Vars.ino
+//				renamed to:		unit_length
+//
+// osd_mode			the flight mode from the flight control
+//				better name:		flight_mode
+//
+// osd_off_switch		changed to static variable in the function
+// osd_switch_last		changed to static variable in the function
+// osd_switch_time		changed to static variable in the function
+//
+// osd_set			changed to static variable in OSD_Vars.ino
+//				renamed to:		setup_menu_active
+//				better solution:	state-machine
+//
+// warning			changed to static variable in OSD_Vars.ino
+//				renamed to:		warning_active
+//				better solution:	state-machine
+// last_warning			changed to static variable in the function
+//				renamed to:		last_warning_type
+//				better solution:	state-machine
+// warning_type			changed to static variable in the function
+//				better solution:	state-machine
+// warning_timer		changed to static variable in the function
+//
+// text_timer			changed to static variable in OSD_Vars.ino
+//
+// setup_menu			changed to static variable in the function
+//
+
+
+
 
 // JRChange: OpenPilot UAVTalk:
 static uint8_t  op_alarm = 0;			// OP alarm info
@@ -11,21 +57,21 @@ static int	curr_amp_per_volt = 0;		// Ampere * 100
 static int	curr_amp_offset = 0;		// Ampere * 10000
 static uint16_t osd_total_A = 0;                // Battery total current [mAh]
 
-/*Panels variables*/
-//Will come from APM telem port
+/* Panels variables */
 
-static float	    nav_roll = 0; // Current desired roll in degrees
-static float        nav_pitch = 0; // Current desired pitch in degrees
-static int16_t	    nav_bearing = 0; // Current desired heading in degrees
-static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
-static int8_t       wp_target_bearing_rotate_int = 0;
-static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
-static uint8_t      wp_number = 0; // Current waypoint number
-static float	    alt_error = 0; // Current altitude error in meters
-static float        aspd_error = 0; // Current airspeed error in meters/second
-static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+static float	    nav_roll = 0;		// Current desired roll in degrees
+static float        nav_pitch = 0;		// Current desired pitch in degrees
 
-static uint8_t      base_mode=0;
+// only used in MAVLink static int16_t	    nav_bearing = 0; // Current desired heading in degrees
+// only used in MAVLink static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
+// only used in MAVLink static int8_t       wp_target_bearing_rotate_int = 0;
+// only used in MAVLink static uint16_t     wp_dist = 0; // Distance to active MISSION in meters
+// only used in MAVLink static uint8_t      wp_number = 0; // Current waypoint number
+// only used in MAVLink static float	    alt_error = 0; // Current altitude error in meters
+// only used in MAVLink static float        aspd_error = 0; // Current airspeed error in meters/second
+// only used in MAVLink static float	    xtrack_error = 0; // Current crosstrack error on x-y plane in meters
+// only used in MAVLink static uint8_t      base_mode = 0;
+
 static bool         motor_armed = 0;
 
 static int16_t      chan1_raw = 0;
@@ -33,20 +79,20 @@ static int16_t      chan2_raw = 0;
 static int16_t      chan1_raw_middle = 0;
 static int16_t      chan2_raw_middle = 0;
 static uint8_t      ch_toggle = 0;
-static boolean      osd_set = 0;
+// refactored static boolean      osd_set = 0;
 static boolean      switch_mode = 0;
 static boolean      pal_ntsc = 0;
 
-static int8_t       setup_menu = 0;
-static float        converts = 0;
-static float        converth = 0;
+// refactored static int8_t       setup_menu = 0;
+// refactored static float        converts = 0;
+// refactored static float        converth = 0;
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
 static uint8_t      battv = 0;                //Battery warning voltage - units Volt *10 
 //static int        battp = 0;
 
-static uint8_t      spe = 0;
-static uint8_t      high = 0;
+// refactored static uint8_t      spe = 0;
+// refactored static uint8_t      high = 0;
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
 static int8_t       osd_battery_remaining_A = 0;    // 0 to 100 <=> 0 to 1000
@@ -59,24 +105,25 @@ static uint8_t      batt_warn_level = 0;
 //static uint8_t    osd_battery_pic_B = 0xb4;     // picture to show battery remaining
 static float        start_Time = -1.0;
 static uint8_t      osd_mode = 0;                   // Navigation mode from RC AC2 = CH5, APM = CH8
-static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
-static unsigned long text_timer = 0;
-static unsigned long warning_timer =0;
+// only used in MAVLink static uint8_t      osd_nav_mode = 0;               // Navigation mode from RC AC2 = CH5, APM = CH8
 
-static uint8_t      warning_type = 0;
-static uint8_t      last_warning = 1;
-static uint8_t      warning = 0;
-static uint8_t      osd_off_switch = 0;
-static uint8_t      osd_switch_last = 100;
-static unsigned long         osd_switch_time = 0;
-static float        osd_climb = 0;
+// refactored static unsigned long text_timer = 0;
+// refactored static unsigned long warning_timer =0;
+// refactored static uint8_t      warning_type = 0;
+// refactored static uint8_t      last_warning = 1;
+// refactored static uint8_t      warning = 0;
+// refactored static uint8_t      osd_off_switch = 0;
+// refactored static uint8_t      osd_switch_last = 100;
+// refactored static unsigned long         osd_switch_time = 0;
+
+static float        osd_climb = 0;                  // climb rate	
 
 static float        osd_lat = 0;                    // latidude
 static float        osd_lon = 0;                    // longitude
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
 
-static uint8_t      osd_got_home = 0;               // tels if got home position or not
+static uint8_t      osd_got_home = 0;               // tells if got home position or not
 static float        osd_home_lat = 0;               // home latidude
 static float        osd_home_lon = 0;               // home longitude
 static float        osd_home_alt = 0; 
@@ -89,26 +136,27 @@ static int16_t      osd_yaw = 0;                    // relative heading form DCM
 static float        osd_heading = 0;                // ground course heading from GPS
 
 static float        osd_alt = 0;                    // altitude
-static float        osd_airspeed = -1;              // airspeed
-static float        osd_windspeed = 0;
-static float        osd_windspeedz = 0;
-static float        osd_winddirection = 0;
-static int8_t       osd_wind_arrow_rotate_int;
+// only used in MAVLink static float        osd_airspeed = -1;              // airspeed
+// only used in MAVLink static float        osd_windspeed = 0;
+// only used in MAVLink static float        osd_windspeedz = 0;
+// only used in MAVLink static float        osd_winddirection = 0;
+// unused static int8_t       osd_wind_arrow_rotate_int;
 
-static uint8_t      osd_alt_cnt = 0;              // counter for stable osd_alt
-static float        osd_alt_prev = 0;             // previous altitude
+static uint8_t      osd_alt_cnt = 0;                // counter for stable osd_alt
+static float        osd_alt_prev = 0;               // previous altitude
 
 static float        osd_groundspeed = 0;            // ground speed
 static uint16_t     osd_throttle = 0;               // throtle
 
 //MAVLink session control
-static boolean      mavbeat = 0;
-static float        lastMAVBeat = 0;
-static boolean      waitingMAVBeats = 1;
-static uint8_t      apm_mav_type;
-static uint8_t      apm_mav_system; 
-static uint8_t      apm_mav_component;
-static boolean      enable_mav_request = 0;
+// only used in MAVLink static boolean      mavbeat = 0;
+// only used in MAVLink static float        lastMAVBeat = 0;
+// renamed to waitingTelemetry static boolean      waitingMAVBeats = 1;
+static boolean      waitingTelemetry = 1;
+// only used in MAVLink static uint8_t      apm_mav_type;
+// only used in MAVLink static uint8_t      apm_mav_system; 
+// only used in MAVLink static uint8_t      apm_mav_component;
+// only used in MAVLink static boolean      enable_mav_request = 0;
 
 static const uint8_t npanels = 2;
 static uint8_t panel = 0; 
@@ -118,7 +166,7 @@ byte panB_REG[npanels] = {0b00000000};
 byte panC_REG[npanels] = {0b00000000};
 byte panD_REG[npanels] = {0b00000000};
 
-byte modeScreen = 0; //NTSC:0, PAL:1
+// unused byte modeScreen = 0; //NTSC:0, PAL:1
 
 //byte SerCMD1 = 0;
 //byte SerCMD2 = 0;
