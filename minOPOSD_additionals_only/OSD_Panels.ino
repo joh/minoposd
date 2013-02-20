@@ -347,7 +347,6 @@ void panWarn(int first_col, int first_line) {
 /******************************************************************/
 void panSetup() {
     static int8_t setup_menu = 0;
-
     int delta = 100;
 
     if (millis() > text_timer) {
@@ -412,8 +411,8 @@ void panSetup() {
                 break;
 #endif
         }
+        osd.closePanel();
     }
-    osd.closePanel();
 }
 
 
