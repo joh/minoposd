@@ -63,8 +63,8 @@ static uint8_t		unit_length = 0;
 
 
 // TODO: refactor:
-static boolean		setup_menu_active = 0;
-static boolean		warning_active = 0;
+static boolean		setup_menu_active = false;
+static boolean		warning_active = false;
 static unsigned long	text_timer = 0;
 
 static int16_t		chan1_raw_middle = 0;
@@ -180,14 +180,14 @@ void switchPanels() {
 			case 0:
                             panel = 1;                                                        
                             if (millis() <= SETUP_TIME) {
-                                setup_menu_active = 1;
+                                setup_menu_active = true;
                             } else {
-                                setup_menu_active = 0;
+                                setup_menu_active = false;
                             }                            
                            break;
 			case 1:
                             panel = npanels;
-                            setup_menu_active = 0;                            
+                            setup_menu_active = false;
                            break;
 			case npanels:
                             panel = 0;
@@ -210,7 +210,7 @@ void switchPanels() {
         if (switch_mode == 0) {
             if (ch_raw > PWM_HI) {
                 if (millis() <= SETUP_TIME) {
-                    setup_menu_active = 1;
+                    setup_menu_active = true;
                 }
                 else if (!setup_menu_active && !warning_active) {
                     osd.clear();
@@ -218,12 +218,12 @@ void switchPanels() {
                 panel = npanels;				// off panel
             }
             else if (ch_raw < PWM_LO && panel != 0) {
-                setup_menu_active = 0;
+                setup_menu_active = false;
                 osd.clear();
                 panel = 0;					// first panel
             }
             else if (ch_raw >= PWM_LO && ch_raw <= PWM_HI && panel != 1 && !warning_active) {
-                setup_menu_active = 0;
+                setup_menu_active = false;
                 osd.clear();
                 panel = 1;					// second panel
             }        
@@ -231,12 +231,12 @@ void switchPanels() {
             if (ch_raw > PWM_LO) {
                 if (millis() <= SETUP_TIME && !setup_menu_active) {
                     if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
-                        setup_menu_active = 1;
+                        setup_menu_active = true;
                         osd_switch_time = millis();
                     }
                 } else {
                     if (osd_switch_time + MODE_SWITCH_TIME / 2 < millis()) {
-                        setup_menu_active = 0;
+                        setup_menu_active = false;
                         osd.clear();
                         if (panel == npanels) {
                             panel = 0;
@@ -274,11 +274,11 @@ void panWarn(int first_col, int first_line) {
         if (warning_type != 0) {				// there was a warning, so we now blank it out 1s
             last_warning_type = warning_type;			// save the warning type for cycling
             warning_type = 0;					// blank the text
-            warning_active = 1;
+            warning_active = true;
             warning_timer = millis();            
 	    text_timer = millis() + WARN_FLASH_TIME;		// clear text
         } else {
-            if ((millis() - WARN_RECOVER_TIME) > warning_timer ) warning_active = 0;
+            if ((millis() - WARN_RECOVER_TIME) > warning_timer ) warning_active = false;
             x = last_warning_type;				// start the warning checks where we left it last time
             while (warning_type == 0) {				// cycle through the warning checks
                 x++;

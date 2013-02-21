@@ -6,20 +6,22 @@
 #define npanels		2			    // # of possible panels
 
 
-static boolean      waitingTelemetry = 1;
+static boolean      waitingTelemetry = true;
 
 static uint8_t      panel = 0;                      // active panel: 0 = first panel. 1 = second panel, 2 = panel off
 
-static bool         motor_armed = 0;
+static boolean      motor_armed = false;
 
 static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
+
 static uint8_t      ch_toggle = 0;
-static boolean      switch_mode = 0;
-static boolean      pal_ntsc = 0;
+static boolean      switch_mode = false;
+static boolean      pal_ntsc = false;
 
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
+
 static uint8_t      battv = 0;                      // Battery warning voltage - units Volt *10
 static float        osd_vbat_A = 0;                 // Battery A voltage in milivolt
 static int16_t      osd_curr_A = 0;                 // Battery A current
@@ -30,7 +32,7 @@ static uint8_t      osd_mode = 0;                   // FlightMode of the FlightC
 
 static uint8_t      osd_satellites_visible = 0;     // number of satelites
 static uint8_t      osd_fix_type = 0;               // GPS lock 0-1=no fix, 2=2D, 3=3D
-static float        osd_lat = 0;                    // latidude
+static float        osd_lat = 0;                    // latitude
 static float        osd_lon = 0;                    // longitude
 static float        osd_alt = 0;                    // altitude
 static float        osd_climb = 0;                  // climb rate
@@ -45,11 +47,11 @@ static uint16_t     osd_throttle = 0;               // throttle
 static uint8_t      osd_alt_cnt = 0;                // counter for stable osd_alt
 static float        osd_alt_prev = 0;               // previous altitude
 static uint8_t      osd_got_home = 0;               // tells if got home position or not
-static float        osd_home_lat = 0;               // home latidude
+static float        osd_home_lat = 0;               // home latitude
 static float        osd_home_lon = 0;               // home longitude
 static float        osd_home_alt = 0;               // home altitude
 static long         osd_home_distance = 0;          // distance from home
-static uint8_t      osd_home_direction;             // Arrow direction pointing to home (1-16 to CW loop)
+static uint8_t      osd_home_direction;             // arrow direction pointing to home (1-16 to CW loop)
 
 // OpenPilot UAVTalk:
 static uint8_t      op_alarm = 0;                   // OP alarm info
@@ -121,7 +123,7 @@ static uint8_t      rssipersent = 0;
 static uint8_t      rssical = 0;
 static uint8_t      osd_rssi = 0;		// raw value from mavlink
 static int16_t      rssi = -99;			// scaled value 0-100%
-static bool         rssiraw_on = false;		// 0- display scale value | 1- display raw value
+static boolean      rssiraw_on = false;		// 0- display scale value | 1- display raw value
 static uint8_t      rssi_warn_level = 0;
 
 // raw channel variables
