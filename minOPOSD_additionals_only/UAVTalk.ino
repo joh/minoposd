@@ -387,12 +387,6 @@ int uavtalk_read(void) {
                                         response = UAVTALK_TYPE_ACK;
         				osd_armed		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_ARMED);
         				osd_mode		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_FLIGHTMODE);
-        				if (osd_armed == 0 || osd_armed == 1) {
-        				    motor_armed = 0;
-        				}
-        				else if (osd_armed == 2) {
-        				    motor_armed = 1;
-        				}
 				break;
 				case MANUALCONTROLCOMMAND_OBJID:
                                         response = UAVTALK_TYPE_ACK;

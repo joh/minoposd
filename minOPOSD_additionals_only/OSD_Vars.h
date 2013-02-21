@@ -8,8 +8,6 @@
 
 static uint8_t      panel = 0;                      // active panel: 0 = first panel. 1 = second panel, 2 = panel off
 
-static boolean      motor_armed = false;
-
 static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
 

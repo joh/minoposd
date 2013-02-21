@@ -244,8 +244,8 @@ void panWarn(int first_col, int first_line) {
     static char* warning_string;
     static uint8_t last_warning_type = 1;
     static uint8_t warning_type = 0;
-    static unsigned long warn_recover_timer = 0;
     static unsigned long warn_text_timer = 0;
+    static unsigned long warn_recover_timer = 0;
     int cycle;
 
     if (millis() > warn_text_timer) {				// if the text or blank text has been shown for a while
@@ -260,7 +260,7 @@ void panWarn(int first_col, int first_line) {
                 if (++cycle > WARN_MAX) cycle = 1;
                 switch (cycle) {
                 case 1:						// DISARMED
-		    if (!motor_armed) {
+		    if (osd_armed < 2) {
 			warning_type = cycle;
 			warning_string = "  DISARMED  ";
 		    }
@@ -272,7 +272,7 @@ void panWarn(int first_col, int first_line) {
 		    }
                     break;
 		case 3:						// NO GPS FIX
-                    if ((osd_fix_type) < 2 && osd_got_home) {	// to allow flying in the woods (what I really like) without this annoying warning,
+                    if (osd_fix_type < 2 && osd_got_home) {	// to allow flying in the woods (what I really like) without this annoying warning,
 			warning_type = cycle;			// this warning is only shown if GPS was valid before (osd_got_home)
 			warning_string = " NO GPS FIX ";
 		    }
@@ -302,7 +302,9 @@ void panWarn(int first_col, int first_line) {
 	    if (warning_type) {					// if there a warning
 		warning_active = true;				// then set warning active
 		warn_text_timer = millis() + WARN_FLASH_TIME;	// set show warning time
-		warn_recover_timer = millis() + WARN_RECOVER_TIME;            
+		warn_recover_timer = millis() + WARN_RECOVER_TIME;
+		if (panel > 0) osd.clear();
+		panel = 0;					// switch to first panel if there is a warning
 	    } else {						// if not, we do not want the delay, so a new error shows up immediately
 		if (millis() > warn_recover_timer) {		// if recover time over since last warning
 		    warning_active = false;			// no warning active anymore
@@ -312,10 +314,6 @@ void panWarn(int first_col, int first_line) {
 
 	osd.setPanel(first_col, first_line);
 	osd.openPanel();
-        if (warning_active) {
-            if (panel > 0) osd.clear();
-            panel = 0;						// switch to first panel if there is a warning                  
-        }
         osd.printf("%s", warning_string);
 	osd.closePanel();
     }
