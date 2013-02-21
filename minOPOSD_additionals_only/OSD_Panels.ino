@@ -87,9 +87,8 @@ void writePanels() {
     if (setup_menu_active) {
         panSetup();
     } else {
+        if (ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);					// ever check/display warnings
         if (panel < npanels) {											// first or second panel
-            if (ISd(panel,Warn_BIT))		panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]);		// check/display warnings
-
 	    // these GPS related panels are active under all circumstances
             if (ISa(panel,GPSats_BIT))		panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]);	// number of visible sats
             if (ISa(panel,GPL_BIT))		panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]);		// sat fix type
@@ -121,9 +120,7 @@ void writePanels() {
             if (ISa(panel,Bp_BIT))		panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]);
             if (ISb(panel,Time_BIT))		panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
             if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
-	} else {												// panel off
-            if (ISd(0,Warn_BIT))		panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);			// check/display warnings
-        }
+	}
     }
 
 #ifdef membug
@@ -252,7 +249,7 @@ void panWarn(int first_col, int first_line) {
             last_warning_type = warning_type;			// save the warning type for cycling
             warning_type = 0;
 	    warning_string = "            ";			// blank the warning
-	    warn_text_timer = millis() + WARN_FLASH_TIME;	// set clear warning time
+	    warn_text_timer = millis() + WARN_FLASH_TIME / 2;	// set clear warning time
         } else {
             cycle = last_warning_type;				// start the warning checks cycle where we left it last time
             do {				                // cycle through the warning checks
