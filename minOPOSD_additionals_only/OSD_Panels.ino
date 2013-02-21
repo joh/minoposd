@@ -32,7 +32,8 @@ TODO:
 #define PWM_HI			1800	// [us]	PWM high value
 #define PWM_OFFSET		100	// [us]	PWM offset for detecting stick movement
 
-#define SETUP_TIME		30000	// [ms]	the time after boot while we can enter the setup menu
+#define SETUP_TIME		30000	// [ms]	time after boot while we can enter the setup menu
+#define SETUP_DEBOUNCE_TIME	500	// [ms]	time for RC-TX stick debouncing
 #define SETUP_LOWEST_MENU	2	//	lowest shown setup menue item
 #ifndef FLIGHT_BATT_ON_MINIMOSD
 #define SETUP_HIGHEST_MENU	2	//	highest shown setup menue item
@@ -40,13 +41,13 @@ TODO:
 #define SETUP_HIGHEST_MENU	11	//	highest shown setup menue item
 #endif
 
-#define WARN_FLASH_TIME		1000	// [ms]	the time with which the warnings are flashing
-#define WARN_RECOVER_TIME	4000	// [ms]	the time we stay in the first panel after last warning
-#define WARN_MAX		5	//	the number of implemented warnings
+#define WARN_FLASH_TIME		1000	// [ms]	time with which the warnings are flashing
+#define WARN_RECOVER_TIME	4000	// [ms]	time we stay in the first panel after last warning
+#define WARN_MAX		5	//	number of implemented warnings
 
-#define MODE_SWITCH_TIME	2000	// [ms]	the time for mode switching
+#define MODE_SWITCH_TIME	2000	// [ms]	time for mode switching
 
-#define TIME_RESET_AMPERE	2	// [A]	the current above which the on time is set to 00:00
+#define TIME_RESET_AMPERE	2	// [A]	current above which the on time is set to 00:00
 
 
 /******* GLOBAL VARS *******/
@@ -254,7 +255,7 @@ void panWarn(int first_col, int first_line) {
 	    warn_text_timer = millis() + WARN_FLASH_TIME;	// set clear warning time
         } else {
             cycle = last_warning_type;				// start the warning checks cycle where we left it last time
-            while (!warning_type) {				// cycle through the warning checks
+            do {				                // cycle through the warning checks
                 if (++cycle > WARN_MAX) cycle = 1;
                 switch (cycle) {
                 case 1:						// DISARMED
@@ -295,8 +296,7 @@ void panWarn(int first_col, int first_line) {
 		    }
                     break;
                 }
-                if (cycle == last_warning_type) break;		// we've done a full cycle
-            }
+            } while (!warning_type && cycle != last_warning_type);
 	    if (warning_type) {					// if there a warning
 		warning_active = true;				// then set warning active
 		warn_text_timer = millis() + WARN_FLASH_TIME;	// set show warning time
@@ -324,69 +324,74 @@ void panWarn(int first_col, int first_line) {
 // Output : The settings menu
 /******************************************************************/
 void panSetup() {
+    static unsigned long setup_debounce_timer = 0;
     static int8_t setup_menu = 0;
     int delta = 100;
 
-    osd.clear();
-    osd.setPanel(5, 3);
-    osd.openPanel();
+    if (millis() > setup_debounce_timer) {			// RC-TX stick debouncing
+	setup_debounce_timer = millis() + SETUP_DEBOUNCE_TIME;
 	
-    osd.printf_P(PSTR("Setup screen|||"));
-
-    if (chan1_raw_middle == 0 || chan2_raw_middle == 0) {
-        chan1_raw_middle = chan1_raw;
-        chan2_raw_middle = chan2_raw;
-    }
-
-    if ((chan2_raw - PWM_OFFSET) > chan2_raw_middle ) setup_menu++;
-    else if ((chan2_raw + PWM_OFFSET) < chan2_raw_middle ) setup_menu--;
+        osd.clear();
+        osd.setPanel(5, 3);
+        osd.openPanel();
 	
-    if (setup_menu < SETUP_LOWEST_MENU) setup_menu = SETUP_LOWEST_MENU;
-    else if (setup_menu > SETUP_HIGHEST_MENU) setup_menu = SETUP_HIGHEST_MENU;
+        osd.printf_P(PSTR("Setup screen|||"));
 
-    switch (setup_menu) {
-        case 2:
-            osd.printf_P(PSTR("Battery warning "));
-            osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
-            battv = change_val(battv, battv_ADDR);
-            break;
+        if (chan1_raw_middle == 0 || chan2_raw_middle == 0) {
+            chan1_raw_middle = chan1_raw;
+            chan2_raw_middle = chan2_raw;
+        }
+
+        if ((chan2_raw - PWM_OFFSET) > chan2_raw_middle ) setup_menu++;
+        else if ((chan2_raw + PWM_OFFSET) < chan2_raw_middle ) setup_menu--;
+	
+        if (setup_menu < SETUP_LOWEST_MENU) setup_menu = SETUP_LOWEST_MENU;
+        else if (setup_menu > SETUP_HIGHEST_MENU) setup_menu = SETUP_HIGHEST_MENU;
+
+        switch (setup_menu) {
+            case 2:
+                osd.printf_P(PSTR("Battery warning "));
+                osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
+                battv = change_val(battv, battv_ADDR);
+                break;
 #ifdef FLIGHT_BATT_ON_MINIMOSD
-        case 5:
-	    delta /= 10;
-        case 4:
-	    delta /= 10;
-        case 3:
-	    // volt_div_ratio
-            osd.printf_P(PSTR("Calibrate||measured volt: "));
-            osd.printf("%c%5.2f%c", 0xE2, (float)osd_vbat_A, 0x8E);
-            osd.printf("||volt div ratio:  %5i", volt_div_ratio);
-            volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR, delta);
-            break;
-	case 8:
-	    delta /= 10;
-	case 7:
-	    delta /= 10;
-	case 6:
-	    // curr_amp_offset
-            osd.printf_P(PSTR("Calibrate||measured amp:  "));
-            osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
-            osd.printf("||amp offset:      %5i", curr_amp_offset);
-            curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR, delta);
-            break;
-	case 11:
-	    delta /= 10;
-	case 10:
-	    delta /= 10;
-	case 9:
-	    // curr_amp_per_volt
-            osd.printf_P(PSTR("Calibrate||measured amp:  "));
-            osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
-            osd.printf("||amp per volt:    %5i", curr_amp_per_volt);
-            curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR, delta);
-            break;
+            case 5:
+	        delta /= 10;
+            case 4:
+	        delta /= 10;
+            case 3:
+	        // volt_div_ratio
+                osd.printf_P(PSTR("Calibrate||measured volt: "));
+                osd.printf("%c%5.2f%c", 0xE2, (float)osd_vbat_A, 0x8E);
+                osd.printf("||volt div ratio:  %5i", volt_div_ratio);
+                volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR, delta);
+                break;
+	    case 8:
+	        delta /= 10;
+	    case 7:
+	        delta /= 10;
+	    case 6:
+	        // curr_amp_offset
+                osd.printf_P(PSTR("Calibrate||measured amp:  "));
+                osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
+                osd.printf("||amp offset:      %5i", curr_amp_offset);
+                curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR, delta);
+                break;
+	    case 11:
+	        delta /= 10;
+	    case 10:
+	        delta /= 10;
+	    case 9:
+		// curr_amp_per_volt
+                osd.printf_P(PSTR("Calibrate||measured amp:  "));
+                osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
+                osd.printf("||amp per volt:    %5i", curr_amp_per_volt);
+                curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR, delta);
+                break;
 #endif
+        }
+        osd.closePanel();
     }
-    osd.closePanel();
 }
 
 
