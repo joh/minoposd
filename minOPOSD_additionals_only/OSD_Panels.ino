@@ -81,13 +81,15 @@ void startPanels() {
 
 /******************************************************************/
 // Panel  : writePanels
-// Output : Write the panels or do other things
+// Output : Write the panels
 /******************************************************************/
 void writePanels() {
-    if (ch_toggle > 3) switchPanels();										// this must be first so you can always switch the panel
-    if (!setup_menu_active) {											// setup is called in the else path
+    if (ch_toggle > 3) switchPanels();										// switch panels
+    if (setup_menu_active) {
+        panSetup();
+    } else {
         if (panel < npanels) {											// first or second panel
-            if (ISd(panel,Warn_BIT))		panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]);		// this must be here so warnings are always checked
+            if (ISd(panel,Warn_BIT))		panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]);		// check/display warnings
 
 	    // these GPS related panels are active under all circumstances
             if (ISa(panel,GPSats_BIT))		panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]);	// number of visible sats
@@ -95,7 +97,7 @@ void writePanels() {
 
 	    // these GPS related panels are active if GPS was valid before
 	    if (osd_got_home) {
-		if (ISa(panel,GPS_BIT))		panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]);		// Lat & Lon
+		if (ISa(panel,GPS_BIT))		panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]);		// lat & lon
 		if (ISb(panel,HDis_BIT))	panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]);
                 if (ISb(panel,HDir_BIT))	panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]);
 	    }
@@ -121,10 +123,8 @@ void writePanels() {
             if (ISb(panel,Time_BIT))		panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
             if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
 	} else {												// panel off
-            if (ISd(0,Warn_BIT))		panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);			// this must be here so warnings are always checked
+            if (ISd(0,Warn_BIT))		panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);			// check/display warnings
         }
-    } else {													// setup menu is active
-        panSetup();
     }
 
 #ifdef membug
@@ -238,7 +238,7 @@ void switchPanels() {
 /******************************************************************/
 // Panel  : panWarn
 // Needs  : X, Y locations
-// Output : Warnings if there are any but only if the setup menu is not active
+// Output : Warnings if there are any
 /******************************************************************/
 void panWarn(int first_col, int first_line) {
     static char* warning_string;
@@ -248,7 +248,7 @@ void panWarn(int first_col, int first_line) {
     static unsigned long warn_text_timer = 0;
     int cycle;
 
-    if (!setup_menu_active && millis() > warn_text_timer) {	// if the setup menu is not active and the text or blank text has been shown for a while
+    if (millis() > warn_text_timer) {				// if the text or blank text has been shown for a while
         if (warning_type) {					// there was a warning, so we now blank it out for a while
             last_warning_type = warning_type;			// save the warning type for cycling
             warning_type = 0;

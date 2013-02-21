@@ -194,11 +194,6 @@ void setup()
     // House cleaning, clear display and enable timers
     osd.clear();
     mavlinkTimer.Enable();
-    
-// JRChange: OpenPilot UAVTalk:
-#ifdef PROTOCOL_UAVTALK
-    writePanels();       // for initial 'Waiting for ...' message
-#endif
 
 } // END of setup();
 
@@ -222,6 +217,8 @@ void loop()
         analog_rssi_read();
 #endif
         OnMavlinkTimer();	// duration is up to approx. 10ms depending on choosen display features
+    } else {
+	mavlinkTimer.Run();
     }
 #else
     if(enable_mav_request == 1){//Request rate control
