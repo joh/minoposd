@@ -93,14 +93,16 @@ void startPanels() {
 // TODO   : REFACTOR
 /******************************************************************/
 void writePanels() {
-    if (uavtalk_state() == TELEMETRYSTATS_STATE_CONNECTED) {
-        if (waitingTelemetry == 1) {
+    static boolean waitingTelemetry = true;
+    
+    if (uavtalk_state() == TELEMETRYSTATS_STATE_CONNECTED) {							// telemetry communication running
+        if (waitingTelemetry) {
             osd.clear();
-	    waitingTelemetry = 0;
+	    waitingTelemetry = false;
         }
-        if (ch_toggle > 3) switchPanels();									// This must be first so you can always switch the panel
-        if (!setup_menu_active) {										// setup panel is called in the else at the end
-            if (panel != npanels) {
+        if (ch_toggle > 3) switchPanels();									// this must be first so you can always switch the panel
+        if (!setup_menu_active) {										// setup is called in the else path
+            if (panel < npanels) {										// first or second panel
                 if (ISd(panel,Warn_BIT))	panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]);		// this must be here so warnings are always checked
 		
 		// these GPS related panels are active under all circumstances
@@ -134,17 +136,17 @@ void writePanels() {
                 if (ISa(panel,Bp_BIT))		panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]);
                 if (ISb(panel,Time_BIT))	panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
                 if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
-            } else {												// panel == npanels
+            } else {												// panel off
                 if (ISd(0,Warn_BIT))		panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);			// this must be here so warnings are always checked
             }
-        } else {												// if (osd_on > 0)
+        } else {												// setup menu is active
             panSetup();
         }
     } else {													// no telemetry communication
-        if (waitingTelemetry == 0) {
+        if (!waitingTelemetry) {
             osd.clear();
         }
-        waitingTelemetry = 1;
+        waitingTelemetry = true;
         panWaitCom(5,10);
     }
 
@@ -362,7 +364,7 @@ void panSetup() {
 	
 	osd.printf_P(PSTR("Setup screen|||"));
 
-        if (chan1_raw_middle == 0 && chan2_raw_middle == 0) {
+        if (chan1_raw_middle == 0 || chan2_raw_middle == 0) {
             chan1_raw_middle = chan1_raw;
             chan2_raw_middle = chan2_raw;
         }
@@ -550,7 +552,7 @@ void panHomeDir(int first_col, int first_line) {
 /******************************************************************/
 // Panel  : panHomeAlt
 // Needs  : X, Y locations
-// Output : Hom altidude
+// Output : Hom altitude
 /******************************************************************/
 void panHomeAlt(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
@@ -563,7 +565,7 @@ void panHomeAlt(int first_col, int first_line) {
 /******************************************************************/
 // Panel  : panAlt
 // Needs  : X, Y locations
-// Output : Altidude
+// Output : Altitude
 /******************************************************************/
 void panAlt(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);

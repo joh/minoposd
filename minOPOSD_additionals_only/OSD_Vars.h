@@ -6,8 +6,6 @@
 #define npanels		2			    // # of possible panels
 
 
-static boolean      waitingTelemetry = true;
-
 static uint8_t      panel = 0;                      // active panel: 0 = first panel. 1 = second panel, 2 = panel off
 
 static boolean      motor_armed = false;
