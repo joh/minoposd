@@ -59,8 +59,8 @@ static uint16_t osd_total_A = 0;                // Battery total current [mAh]
 
 /* Panels variables */
 
-static float	    nav_roll = 0;		// Current desired roll in degrees
-static float        nav_pitch = 0;		// Current desired pitch in degrees
+// only used in MAVLink static float	    nav_roll = 0;		// Current desired roll in degrees
+// only used in MAVLink static float        nav_pitch = 0;		// Current desired pitch in degrees
 
 // only used in MAVLink static int16_t	    nav_bearing = 0; // Current desired heading in degrees
 // only used in MAVLink static int16_t	    wp_target_bearing = 0; // Bearing to current MISSION/target in degrees
@@ -88,7 +88,7 @@ static boolean      pal_ntsc = 0;
 // refactored static float        converth = 0;
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
-static uint8_t      battv = 0;                //Battery warning voltage - units Volt *10 
+static uint8_t      battv = 0;                      // Battery warning voltage - units Volt *10 
 //static int        battp = 0;
 
 // refactored static uint8_t      spe = 0;
