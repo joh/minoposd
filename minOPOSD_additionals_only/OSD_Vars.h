@@ -22,8 +22,6 @@ static bool         motor_armed = 0;
 
 static int16_t      chan1_raw = 0;
 static int16_t      chan2_raw = 0;
-static int16_t      chan1_raw_middle = 0;
-static int16_t      chan2_raw_middle = 0;
 static uint8_t      ch_toggle = 0;
 static boolean      switch_mode = 0;
 static boolean      pal_ntsc = 0;
@@ -133,7 +131,6 @@ static bool         rssiraw_on = false;		// 0- display scale value | 1- display 
 static uint8_t      rssi_warn_level = 0;
 
 // raw channel variables
-static uint16_t     ch_raw = 0;
 static uint16_t     osd_chan5_raw = 1000;
 static uint16_t     osd_chan6_raw = 1000;
 static uint16_t     osd_chan7_raw = 1000;

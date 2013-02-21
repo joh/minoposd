@@ -67,6 +67,9 @@ static boolean		setup_menu_active = 0;
 static boolean		warning_active = 0;
 static unsigned long	text_timer = 0;
 
+static int16_t		chan1_raw_middle = 0;
+static int16_t		chan2_raw_middle = 0;
+
 
 
 
@@ -164,6 +167,7 @@ void switchPanels() {
     static uint8_t      	osd_off_switch = 0;
     static uint8_t      	osd_switch_last = 100;
     static unsigned long	osd_switch_time = 0;
+    static uint16_t		ch_raw = 0;
 
     if (ch_toggle == 4) {
         if ((osd_mode != FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE) && (osd_mode != FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD)) {
