@@ -287,9 +287,6 @@ void panWarn(int first_col, int first_line) {
 		    }
                     break;
                 case 5:						// RSSI LOW
-#ifdef PACKETRXOK_ON_MINIMOSD
-		    rssi = PacketRxOk_get();
-#endif
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) {
 			warning_type = cycle;
 			warning_string = "  RSSI LOW  ";
@@ -597,14 +594,7 @@ void panRose(int first_col, int first_line) {
 void panRSSI(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-#ifdef PACKETRXOK_ON_MINIMOSD
-    PacketRxOk_print();
-#else
-    rssi = (int16_t)osd_rssi;
-    if (!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
-    if (rssi < -99) rssi = -99;
     osd.printf("%c%3i%c", 0xE1, rssi, 0x25);
-#endif
     osd.closePanel();
 }
 

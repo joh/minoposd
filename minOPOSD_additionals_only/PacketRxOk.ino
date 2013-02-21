@@ -75,14 +75,9 @@ void PacketRxOk_init(void) {
 }
 
 
-uint8_t PacketRxOk_get(void) {
-	return ((uint8_t) packet_rxok_percent) >= 99 ? 100 : (uint8_t) packet_rxok_percent;
-}
-
-
-void PacketRxOk_print(void) {
+void PacketRxOk_read(void) {
 	packet_rxok_percent = 10.0 / (packet_ok + packet_nok) * packet_ok + packet_rxok_percent * .9;
 	packet_ok = 0;
 	packet_nok = 0;
-	osd.printf("%c%3i%c", 0xE1, PacketRxOk_get(), 0x25);
+	osd_rssi = ((uint8_t) packet_rxok_percent) >= 99 ? 100 : (uint8_t) packet_rxok_percent;
 }

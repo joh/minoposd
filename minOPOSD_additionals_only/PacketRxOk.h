@@ -43,8 +43,7 @@
 #define PRO_INT  			1
 
 void PacketRxOk_init(void);
-uint8_t PacketRxOk_get(void);
-void PacketRxOk_print(void);
+void PacketRxOk_read(void);
 
 
 #endif /* PACKETRXOK_H_ */

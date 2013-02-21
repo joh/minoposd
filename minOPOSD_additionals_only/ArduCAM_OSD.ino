@@ -189,7 +189,7 @@ void setup()
 #endif
 
     // Startup MAVLink timers  
-    mavlinkTimer.Set(&OnMavlinkTimer, 120);
+    mavlinkTimer.Set(&OnMavlinkTimer, 100);
 
     // House cleaning, clear display and enable timers
     osd.clear();
@@ -209,14 +209,7 @@ void loop()
 // JRChange: OpenPilot UAVTalk:
 #ifdef PROTOCOL_UAVTALK
     if (uavtalk_read()) {
-// JRChange: Flight Batt on MinimOSD:
-#ifdef FLIGHT_BATT_ON_MINIMOSD
-        flight_batt_read();
-#endif
-#ifdef ANALOG_RSSI_ON_MINIMOSD
-        analog_rssi_read();
-#endif
-        OnMavlinkTimer();	// duration is up to approx. 10ms depending on choosen display features
+        OnMavlinkTimer();
     } else {
 	mavlinkTimer.Run();
     }
@@ -246,16 +239,28 @@ void loop()
 
 /* *********************************************** */
 /* ******** functions used in main loop() ******** */
-void OnMavlinkTimer()
+void OnMavlinkTimer()			// duration is up to approx. 10ms depending on choosen display features
 {
-    setHeadingPatern();  // generate the heading patern
 
-    //  osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
-    //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
+#ifdef FLIGHT_BATT_ON_MINIMOSD
+    flight_batt_read();
+#endif
 
-    setHomeVars(osd);   // calculate and set Distance from home and Direction to home
-    
-    writePanels();       // writing enabled panels (check OSD_Panels Tab)
+#ifdef PACKETRXOK_ON_MINIMOSD
+    PacketRxOk_read();
+    rssi = (int16_t) osd_rssi;
+#endif
+
+#ifdef ANALOG_RSSI_ON_MINIMOSD
+    analog_rssi_read();
+    rssi = (int16_t) osd_rssi;
+    if (!rssiraw_on) rssi = (int16_t)((float)(rssi - rssipersent)/(float)(rssical-rssipersent)*100.0f);
+    if (rssi < -99) rssi = -99;
+#endif
+
+    setHeadingPatern();			// generate the heading patern
+    setHomeVars(osd);			// calculate and set Distance from home and Direction to home
+    writePanels();				// writing enabled panels (check OSD_Panels Tab)
 }
 
 
