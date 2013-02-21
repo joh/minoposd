@@ -832,7 +832,7 @@ int change_int_val(int value, int address, int delta) {
     if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value -= delta;
     else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value += delta;
 
-    if (value != value_old && setup_menu_active) {
+    if (value != value_old) {
 	EEPROM.write(address, value&0xff);
 	EEPROM.write(address+1, (value>>8)&0xff);
     }
@@ -847,7 +847,7 @@ int change_val(int value, int address) {
     if (chan1_raw > chan1_raw_middle + PWM_OFFSET) value--;
     else if (chan1_raw < chan1_raw_middle - PWM_OFFSET) value++;
 
-    if (value != value_old && setup_menu_active) EEPROM.write(address, value);
+    if (value != value_old) EEPROM.write(address, value);
     return value;
 }
 
