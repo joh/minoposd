@@ -10,10 +10,7 @@ there is more refactoring necessary because there are too much side effects
 TODO:
 
 	refactor:
-		writePanels
 		switchPanels
-		panWarn
-		panSetup
 	
 	implement usage of pal_ntsc
 	
@@ -47,30 +44,25 @@ TODO:
 
 #define WARN_FLASH_TIME		1000	// [ms]	the time with which the warnings are flashing
 #define WARN_RECOVER_TIME	4000	// [ms]	the time we stay in the first panel after last warning
-#define WARN_MAX		3	//	the number of implemented warnings
+#define WARN_MAX		5	//	the number of implemented warnings
 
 #define MODE_SWITCH_TIME	2000	// [ms]	the time for mode switching
 
 #define TIME_RESET_AMPERE	2	// [A]	the current above which the on time is set to 00:00
 
 
+/******* GLOBAL VARS *******/
 
+static boolean		setup_menu_active = false;
+static boolean		warning_active = false;
 
 static float		convert_speed = 0;
 static float		convert_length = 0;
 static uint8_t		unit_speed = 0;
 static uint8_t		unit_length = 0;
 
-
-// TODO: refactor:
-static boolean		setup_menu_active = false;
-static boolean		warning_active = false;
-static unsigned long	text_timer = 0;
-
 static int16_t		chan1_raw_middle = 0;
 static int16_t		chan2_raw_middle = 0;
-
-
 
 
 /******* MAIN FUNCTIONS *******/
@@ -82,7 +74,7 @@ static int16_t		chan2_raw_middle = 0;
 /******************************************************************/
 void startPanels() {
     osd.clear();
-    panLogo();		// display logo  
+    panLogo();		// display logo
     set_converts();	// initialize the units
 }
 
@@ -90,64 +82,49 @@ void startPanels() {
 /******************************************************************/
 // Panel  : writePanels
 // Output : Write the panels or do other things
-// TODO   : REFACTOR
 /******************************************************************/
 void writePanels() {
-    static boolean waitingTelemetry = true;
-    
-    if (uavtalk_state() == TELEMETRYSTATS_STATE_CONNECTED) {							// telemetry communication running
-        if (waitingTelemetry) {
-            osd.clear();
-	    waitingTelemetry = false;
+    if (ch_toggle > 3) switchPanels();										// this must be first so you can always switch the panel
+    if (!setup_menu_active) {											// setup is called in the else path
+        if (panel < npanels) {											// first or second panel
+            if (ISd(panel,Warn_BIT))		panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]);		// this must be here so warnings are always checked
+
+	    // these GPS related panels are active under all circumstances
+            if (ISa(panel,GPSats_BIT))		panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]);	// number of visible sats
+            if (ISa(panel,GPL_BIT))		panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]);		// sat fix type
+
+	    // these GPS related panels are active if GPS was valid before
+	    if (osd_got_home) {
+		if (ISa(panel,GPS_BIT))		panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]);		// Lat & Lon
+		if (ISb(panel,HDis_BIT))	panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]);
+                if (ISb(panel,HDir_BIT))	panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]);
+	    }
+
+	    // these GPS related panels are active if GPS was valid before and we have a sat fix
+	    if (osd_got_home && osd_fix_type > 1) {
+                if (ISc(panel,Halt_BIT))	panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]);
+                if (ISc(panel,Alt_BIT))		panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]);
+                if (ISc(panel,Vel_BIT))		panVel(panVel_XY[0][panel], panVel_XY[1][panel]);
+                if (ISd(panel,Climb_BIT))	panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
+                if (ISb(panel,Head_BIT))	panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]);
+                if (ISb(panel,Rose_BIT))	panRose(panRose_XY[0][panel], panRose_XY[1][panel]);
+	    }
+
+	    if (ISd(panel,RSSI_BIT))		panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]);
+            if (ISa(panel,Rol_BIT))		panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]);
+            if (ISa(panel,Pit_BIT))		panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]);
+            if (ISc(panel,Thr_BIT))		panThr(panThr_XY[0][panel], panThr_XY[1][panel]);
+            if (ISc(panel,FMod_BIT))		panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);
+            if (ISa(panel,BatA_BIT))		panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]);
+            if (ISc(panel,CurA_BIT))		panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
+            if (ISa(panel,Bp_BIT))		panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]);
+            if (ISb(panel,Time_BIT))		panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
+            if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
+	} else {												// panel off
+            if (ISd(0,Warn_BIT))		panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);			// this must be here so warnings are always checked
         }
-        if (ch_toggle > 3) switchPanels();									// this must be first so you can always switch the panel
-        if (!setup_menu_active) {										// setup is called in the else path
-            if (panel < npanels) {										// first or second panel
-                if (ISd(panel,Warn_BIT))	panWarn(panWarn_XY[0][panel], panWarn_XY[1][panel]);		// this must be here so warnings are always checked
-		
-		// these GPS related panels are active under all circumstances
-                if (ISa(panel,GPSats_BIT))	panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]);	// number of visible sats
-                if (ISa(panel,GPL_BIT))		panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]);		// sat fix type
-		
-		// these GPS related panels are active if GPS was valid before
-		if (osd_got_home) {
-		    if (ISa(panel,GPS_BIT))	panGPS(panGPS_XY[0][panel], panGPS_XY[1][panel]);		// Lat & Lon
-		    if (ISb(panel,HDis_BIT))	panHomeDis(panHomeDis_XY[0][panel], panHomeDis_XY[1][panel]);
-                    if (ISb(panel,HDir_BIT))	panHomeDir(panHomeDir_XY[0][panel], panHomeDir_XY[1][panel]);
-		}
-		
-		// these GPS related panels are active if GPS was valid before and we have a sat fix
-		if (osd_got_home && osd_fix_type > 1) {
-                    if (ISc(panel,Halt_BIT))	panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]);
-                    if (ISc(panel,Alt_BIT))	panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]);
-                    if (ISc(panel,Vel_BIT))	panVel(panVel_XY[0][panel], panVel_XY[1][panel]);
-                    if (ISd(panel,Climb_BIT))	panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
-                    if (ISb(panel,Head_BIT))	panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]);
-                    if (ISb(panel,Rose_BIT))	panRose(panRose_XY[0][panel], panRose_XY[1][panel]);
-		}
-		
-                if (ISd(panel,RSSI_BIT))	panRSSI(panRSSI_XY[0][panel], panRSSI_XY[1][panel]);
-                if (ISa(panel,Rol_BIT))		panRoll(panRoll_XY[0][panel], panRoll_XY[1][panel]);
-                if (ISa(panel,Pit_BIT))		panPitch(panPitch_XY[0][panel], panPitch_XY[1][panel]);
-                if (ISc(panel,Thr_BIT))		panThr(panThr_XY[0][panel], panThr_XY[1][panel]);
-                if (ISc(panel,FMod_BIT))	panFlightMode(panFMod_XY[0][panel], panFMod_XY[1][panel]);
-                if (ISa(panel,BatA_BIT))	panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]);
-                if (ISc(panel,CurA_BIT))	panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
-                if (ISa(panel,Bp_BIT))		panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]);
-                if (ISb(panel,Time_BIT))	panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
-                if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
-            } else {												// panel off
-                if (ISd(0,Warn_BIT))		panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);			// this must be here so warnings are always checked
-            }
-        } else {												// setup menu is active
-            panSetup();
-        }
-    } else {													// no telemetry communication
-        if (!waitingTelemetry) {
-            osd.clear();
-        }
-        waitingTelemetry = true;
-        panWaitCom(5,10);
+    } else {													// setup menu is active
+        panSetup();
     }
 
 #ifdef membug
@@ -261,84 +238,84 @@ void switchPanels() {
 /******************************************************************/
 // Panel  : panWarn
 // Needs  : X, Y locations
-// Output : Warnings if there are any
-// TODO   : REFACTOR
+// Output : Warnings if there are any but only if the setup menu is not active
 /******************************************************************/
 void panWarn(int first_col, int first_line) {
+    static char* warning_string;
     static uint8_t last_warning_type = 1;
     static uint8_t warning_type = 0;
-    static unsigned long warning_timer = 0;
-    
-    char* warning_string;
-    int x;
+    static unsigned long warn_recover_timer = 0;
+    static unsigned long warn_text_timer = 0;
+    int cycle;
 
-    if (millis() > text_timer) {				// if the text or blank text has been shown for a while
-        if (warning_type != 0) {				// there was a warning, so we now blank it out 1s
+    if (!setup_menu_active && millis() > warn_text_timer) {	// if the setup menu is not active and the text or blank text has been shown for a while
+        if (warning_type) {					// there was a warning, so we now blank it out for a while
             last_warning_type = warning_type;			// save the warning type for cycling
-            warning_type = 0;					// blank the text
-            warning_active = true;
-            warning_timer = millis();            
-	    text_timer = millis() + WARN_FLASH_TIME;		// clear text
+            warning_type = 0;
+	    warning_string = "            ";			// blank the warning
+	    warn_text_timer = millis() + WARN_FLASH_TIME;	// set clear warning time
         } else {
-            if ((millis() - WARN_RECOVER_TIME) > warning_timer ) warning_active = false;
-            x = last_warning_type;				// start the warning checks where we left it last time
-            while (warning_type == 0) {				// cycle through the warning checks
-                x++;
-                if (x > WARN_MAX) x = 1;
-                switch (x) {
-                case 1:						// NO GPS FIX
-								// to allow flying in the woods (what I really like) without this annoying warning, 
-								// this warning is only shown if GPS was valid before (osd_got_home)
-                    if ((osd_fix_type) < 2 && osd_got_home) warning_type = x;
+            cycle = last_warning_type;				// start the warning checks cycle where we left it last time
+            while (!warning_type) {				// cycle through the warning checks
+                if (++cycle > WARN_MAX) cycle = 1;
+                switch (cycle) {
+                case 1:						// DISARMED
+		    if (!motor_armed) {
+			warning_type = cycle;
+			warning_string = "  DISARMED  ";
+		    }
                     break;
-                case 2:						// LOW BATT
+                case 2:						// No telemetry communication
+		    if (uavtalk_state() != TELEMETRYSTATS_STATE_CONNECTED) {
+			warning_type = cycle;
+			warning_string = " NO TEL COM ";
+		    }
+                    break;
+		case 3:						// NO GPS FIX
+                    if ((osd_fix_type) < 2 && osd_got_home) {	// to allow flying in the woods (what I really like) without this annoying warning,
+			warning_type = cycle;			// this warning is only shown if GPS was valid before (osd_got_home)
+			warning_string = " NO GPS FIX ";
+		    }
+                    break;
+                case 4:						// BATT LOW
 #ifdef FLIGHT_BATT_ON_MINIMOSD
-                    if (osd_vbat_A < battv/10.0) warning_type = x;
+                    if (osd_vbat_A < battv/10.0) {
 #else
-                    if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < batt_warn_level) warning_type = x;
+                    if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < batt_warn_level) {
 #endif
+			warning_type = cycle;
+			warning_string = "  BATT LOW  ";
+		    }
                     break;
-                case 3:						// LOW RSSI
+                case 5:						// RSSI LOW
 #ifdef PACKETRXOK_ON_MINIMOSD
 		    rssi = PacketRxOk_get();
 #endif
-                    if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) warning_type = x;
+                    if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) {
+			warning_type = cycle;
+			warning_string = "  RSSI LOW  ";
+		    }
                     break;
                 }
-                if (x == last_warning_type) break;		// we've done a full cycle
+                if (cycle == last_warning_type) break;		// we've done a full cycle
             }
-	    if (warning_type != 0) {
-		text_timer = millis() + WARN_FLASH_TIME;	// show warning if there is any
-	    }							// if not, we do not want the 1s delay, so a new error shows up immediately
-        }
-	
-        if (motor_armed == 0) {
-	    warning_string = "  DISARMED  ";
-        } else {
-            switch (warning_type) { 
-            case 0:
-                warning_string = "            ";
-                break;   
-            case 1:
-                warning_string = " NO GPS FIX ";
-                break;
-            case 2:
-                warning_string = "  BATT LOW  ";
-                break;
-            case 3:
-                warning_string = "  RSSI LOW  ";
-                break;
-            }
+	    if (warning_type) {					// if there a warning
+		warning_active = true;				// then set warning active
+		warn_text_timer = millis() + WARN_FLASH_TIME;	// set show warning time
+		warn_recover_timer = millis() + WARN_RECOVER_TIME;            
+	    } else {						// if not, we do not want the delay, so a new error shows up immediately
+		if (millis() > warn_recover_timer) {		// if recover time over since last warning
+		    warning_active = false;			// no warning active anymore
+		}
+	    }
         }
 
 	osd.setPanel(first_col, first_line);
 	osd.openPanel();
-	
         if (warning_active) {
-            if (panel >= 1) osd.clear();
+            if (panel > 0) osd.clear();
             panel = 0;						// switch to first panel if there is a warning                  
         }
-	
         osd.printf("%s", warning_string);
 	osd.closePanel();
     }
@@ -349,76 +326,71 @@ void panWarn(int first_col, int first_line) {
 // Panel  : panSetup
 // Needs  : Nothing, uses whole screen
 // Output : The settings menu
-// TODO   : REFACTOR
 /******************************************************************/
 void panSetup() {
     static int8_t setup_menu = 0;
     int delta = 100;
 
-    if (millis() > text_timer) {
-        text_timer = millis() + WARN_FLASH_TIME / 2;
-
-        osd.clear();
-        osd.setPanel(5, 3);
-        osd.openPanel();
+    osd.clear();
+    osd.setPanel(5, 3);
+    osd.openPanel();
 	
-	osd.printf_P(PSTR("Setup screen|||"));
+    osd.printf_P(PSTR("Setup screen|||"));
 
-        if (chan1_raw_middle == 0 || chan2_raw_middle == 0) {
-            chan1_raw_middle = chan1_raw;
-            chan2_raw_middle = chan2_raw;
-        }
-
-        if ((chan2_raw - PWM_OFFSET) > chan2_raw_middle ) setup_menu++;
-        else if ((chan2_raw + PWM_OFFSET) < chan2_raw_middle ) setup_menu--;
-	
-        if (setup_menu < SETUP_LOWEST_MENU) setup_menu = SETUP_LOWEST_MENU;
-        else if (setup_menu > SETUP_HIGHEST_MENU) setup_menu = SETUP_HIGHEST_MENU;
-
-        switch (setup_menu) {
-            case 2:
-                osd.printf_P(PSTR("Battery warning "));
-                osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
-                battv = change_val(battv, battv_ADDR);
-                break;
-#ifdef FLIGHT_BATT_ON_MINIMOSD
-            case 5:
-		delta /= 10;
-            case 4:
-		delta /= 10;
-            case 3:
-		// volt_div_ratio
-                osd.printf_P(PSTR("Calibrate||measured volt: "));
-                osd.printf("%c%5.2f%c", 0xE2, (float)osd_vbat_A, 0x8E);
-                osd.printf("||volt div ratio:  %5i", volt_div_ratio);
-                volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR, delta);
-                break;
-            case 8:
-		delta /= 10;
-            case 7:
-		delta /= 10;
-            case 6:
-		// curr_amp_offset
-                osd.printf_P(PSTR("Calibrate||measured amp:  "));
-                osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
-                osd.printf("||amp offset:      %5i", curr_amp_offset);
-                curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR, delta);
-                break;
-            case 11:
-		delta /= 10;
-            case 10:
-		delta /= 10;
-            case 9:
-		// curr_amp_per_volt
-                osd.printf_P(PSTR("Calibrate||measured amp:  "));
-                osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
-                osd.printf("||amp per volt:    %5i", curr_amp_per_volt);
-                curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR, delta);
-                break;
-#endif
-        }
-        osd.closePanel();
+    if (chan1_raw_middle == 0 || chan2_raw_middle == 0) {
+        chan1_raw_middle = chan1_raw;
+        chan2_raw_middle = chan2_raw;
     }
+
+    if ((chan2_raw - PWM_OFFSET) > chan2_raw_middle ) setup_menu++;
+    else if ((chan2_raw + PWM_OFFSET) < chan2_raw_middle ) setup_menu--;
+	
+    if (setup_menu < SETUP_LOWEST_MENU) setup_menu = SETUP_LOWEST_MENU;
+    else if (setup_menu > SETUP_HIGHEST_MENU) setup_menu = SETUP_HIGHEST_MENU;
+
+    switch (setup_menu) {
+        case 2:
+            osd.printf_P(PSTR("Battery warning "));
+            osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
+            battv = change_val(battv, battv_ADDR);
+            break;
+#ifdef FLIGHT_BATT_ON_MINIMOSD
+        case 5:
+	    delta /= 10;
+        case 4:
+	    delta /= 10;
+        case 3:
+	    // volt_div_ratio
+            osd.printf_P(PSTR("Calibrate||measured volt: "));
+            osd.printf("%c%5.2f%c", 0xE2, (float)osd_vbat_A, 0x8E);
+            osd.printf("||volt div ratio:  %5i", volt_div_ratio);
+            volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR, delta);
+            break;
+	case 8:
+	    delta /= 10;
+	case 7:
+	    delta /= 10;
+	case 6:
+	    // curr_amp_offset
+            osd.printf_P(PSTR("Calibrate||measured amp:  "));
+            osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
+            osd.printf("||amp offset:      %5i", curr_amp_offset);
+            curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR, delta);
+            break;
+	case 11:
+	    delta /= 10;
+	case 10:
+	    delta /= 10;
+	case 9:
+	    // curr_amp_per_volt
+            osd.printf_P(PSTR("Calibrate||measured amp:  "));
+            osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
+            osd.printf("||amp per volt:    %5i", curr_amp_per_volt);
+            curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR, delta);
+            break;
+#endif
+    }
+    osd.closePanel();
 }
 
 
@@ -456,19 +428,6 @@ void panLogo() {
 #ifdef JR_SPECIALS
     osd.printf_P(PSTR(" JRS"));
 #endif
-    osd.closePanel();
-}
-
-
-/******************************************************************/
-// Panel  : panWaitCom
-// Needs  : X, Y locations
-// Output : Waiting for UAVTalk comm
-/******************************************************************/
-void panWaitCom(int first_col, int first_line) {
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    osd.printf_P(PSTR("Waiting for|UAVTalk comm . . . . "));
     osd.closePanel();
 }
 
