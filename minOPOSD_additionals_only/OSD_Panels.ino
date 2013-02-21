@@ -12,8 +12,6 @@ TODO:
 	refactor:
 		switchPanels
 	
-	implement usage of pal_ntsc
-	
 	maybe implement usage of panCallsign
 
 */

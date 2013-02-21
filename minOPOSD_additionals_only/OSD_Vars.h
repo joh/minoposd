@@ -13,7 +13,6 @@ static int16_t      chan2_raw = 0;
 
 static uint8_t      ch_toggle = 0;
 static boolean      switch_mode = false;
-static boolean      pal_ntsc = false;
 
 static uint8_t      overspeed = 0;
 static uint8_t      stall = 0;
