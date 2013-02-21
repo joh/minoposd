@@ -759,23 +759,25 @@ void panBatteryPercent(int first_col, int first_line) {
 // Output : Time from bootup or start
 /******************************************************************/
 void panTime(int first_col, int first_line) {
+    int start_time;
+
 #ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > TIME_RESET_AMPERE for the 1st time
     static unsigned long engine_start_time = 0;
     
     if (engine_start_time == 0 && osd_curr_A > TIME_RESET_AMPERE * 100) {
         engine_start_time = millis();
     }
-    start_Time = (millis() - engine_start_time)/1000;
+    start_time = (int) ((millis() - engine_start_time) / 1000);
     
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%2i%c%02i", 0xB3, ((int)start_Time/60)%60, 0x3A, (int)start_Time%60);
+    osd.printf("%c%2i%c%02i", 0xB3, ((int)(start_time/60))%60, 0x3A, start_time%60);
     osd.closePanel();
 #else
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    start_Time = millis()/1000;
-    osd.printf("%c%2i%c%02i", 0xB3, ((int)start_Time/60)%60, 0x3A, (int)start_Time%60);
+    start_time = (int) (millis() / 1000);
+    osd.printf("%c%2i%c%02i", 0xB3, ((int)(start_time/60))%60, 0x3A, start_time%60);
     osd.closePanel();
 #endif
 }
