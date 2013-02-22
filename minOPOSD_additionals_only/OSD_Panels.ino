@@ -580,8 +580,6 @@ void panHeading(int first_col, int first_line) {
 void panRose(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    //osd_heading  = osd_yaw;
-    //if (osd_yaw < 0) osd_heading = 360 + osd_yaw;
     osd.printf("%s|%c%s%c", "\x20\xc0\xc0\xc0\xc0\xc0\xc7\xc0\xc0\xc0\xc0\xc0\x20", 0xd0, buf_show, 0xd1);
     osd.closePanel();
 }

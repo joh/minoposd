@@ -411,6 +411,7 @@ int uavtalk_read(void) {
 				break;
 				case GPSPOSITION_OBJID:
                                         response = UAVTALK_TYPE_ACK;
+#ifndef GPS_SIMULATION
 					osd_lat			= uavtalk_get_int32(&msg, GPSPOSITION_OBJ_LAT) / 10000000.0;
 					osd_lon			= uavtalk_get_int32(&msg, GPSPOSITION_OBJ_LON) / 10000000.0;
 					osd_satellites_visible	= uavtalk_get_int8(&msg, GPSPOSITION_OBJ_SATELLITES);
@@ -418,6 +419,7 @@ int uavtalk_read(void) {
 					osd_heading		= uavtalk_get_float(&msg, GPSPOSITION_OBJ_HEADING);
 					osd_alt			= uavtalk_get_float(&msg, GPSPOSITION_OBJ_ALTITUDE);
 					osd_groundspeed		= uavtalk_get_float(&msg, GPSPOSITION_OBJ_GROUNDSPEED);
+#endif
 				break;
 				// because of #define PIOS_GPS_MINIMAL in the OP flight code, the following is unfortunately currently not supported:
 				case GPSTIME_OBJID:

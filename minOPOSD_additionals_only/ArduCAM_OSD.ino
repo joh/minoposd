@@ -242,6 +242,25 @@ void loop()
 void OnMavlinkTimer()			// duration is up to approx. 10ms depending on choosen display features
 {
 
+#ifdef GPS_SIMULATION			// simple GPS data simulation
+    if (!osd_got_home) {
+	osd_got_home = true;
+	osd_fix_type = 3;
+	osd_satellites_visible = 10;
+	osd_lat = 85.123456;
+	osd_lon =  3.123456;
+	osd_alt =  0.0;
+	osd_home_lat = osd_lat;
+	osd_home_lon = osd_lon;
+	osd_home_alt = osd_alt;
+    }
+    
+    osd_heading = osd_heading > 360.0 ? 0.0 : osd_heading + 0.5;
+    osd_lat -= 0.000123;
+    osd_lon += 0.000123;
+    osd_alt += 0.1;
+#endif
+
 #ifdef FLIGHT_BATT_ON_MINIMOSD
     flight_batt_read();
 #endif

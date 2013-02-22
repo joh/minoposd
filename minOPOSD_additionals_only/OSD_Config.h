@@ -18,6 +18,8 @@
 //#define JR_SPECIALS
 // JRChange: OP debug
 //#define OP_DEBUG
+// JRChange: GPS simulation
+//#define GPS_SIMULATION
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be
