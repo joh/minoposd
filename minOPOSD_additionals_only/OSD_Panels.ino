@@ -453,7 +453,7 @@ void panGPL(int first_col, int first_line) {
     if (osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x10\x20";
     else if (osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x11\x20";
     osd.printf("%s", gps_str);
-#ifdef JR_SPECIALS	// I use this place for debug info
+#ifdef OP_DEBUG		// I use this place for debug info
     osd.printf("%02x", op_alarm);
 #endif
     osd.closePanel();
@@ -563,7 +563,7 @@ void panClimb(int first_col, int first_line) {
 void panHeading(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-#ifdef JR_SPECIALS
+#ifdef JR_SPECIALS	// show heading with compass point
     osd.printf("%4.0f%c%s", (double)osd_heading, 0xb0, CompassPoint);
 #else
     osd.printf("%4.0f%c", (double)osd_heading, 0xb0);

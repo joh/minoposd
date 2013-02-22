@@ -431,9 +431,11 @@ int uavtalk_read(void) {
 				break;
 				case SYSTEMALARMS_OBJID:
                                         response = UAVTALK_TYPE_ACK;
+#ifdef OP_DEBUG
 					op_alarm  = msg.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
 					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
 					if (op_alarm > 0x11) show_prio_info = 1;
+#endif
 				break;
 				
 				// TODO implement more X_OBJID for more OSD data 

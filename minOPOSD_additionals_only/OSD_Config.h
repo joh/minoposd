@@ -16,6 +16,8 @@
 //#define ANALOG_RSSI_ON_MINIMOSD
 // JRChange: JR specials
 //#define JR_SPECIALS
+// JRChange: OP debug
+//#define OP_DEBUG
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be
