@@ -22,7 +22,7 @@ void setHeadingPattern()
 
 #ifdef JR_SPECIALS
 static char CompassPoint[2];
-const char CompassPointList[16] = {'N', ' ', 'N', 'O', 'O', ' ', 'S', 'O', 'S', ' ', 'S', 'W', 'W', ' ', 'N', 'W'};
+const char CompassPointList[16] = {'N', ' ', 'N', 'E', 'E', ' ', 'S', 'E', 'S', ' ', 'S', 'W', 'W', ' ', 'N', 'W'};
 
 void calculateCompassPoint()
 {
