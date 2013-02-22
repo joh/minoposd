@@ -6,7 +6,7 @@ const char buf_Rule[36] = {0xc2,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
                            0xc4,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
                            0xc3,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0,
                            0xc5,0xc0,0xc0,0xc1,0xc0,0xc0,0xc1,0xc0,0xc0};
-void setHeadingPatern()
+void setHeadingPattern()
 {
   int start;
   start = round((osd_heading * 36)/360);
@@ -18,6 +18,22 @@ void setHeadingPatern()
   }
   buf_show[11] = '\0';
 }
+
+
+#ifdef JR_SPECIALS
+static char CompassPoint[2];
+const char CompassPointList[16] = {'N', ' ', 'N', 'O', 'O', ' ', 'S', 'O', 'S', ' ', 'S', 'W', 'W', ' ', 'N', 'W'};
+
+void calculateCompassPoint()
+{
+  int index;
+
+  index = (int)((osd_heading + 22.5) / 45.0);
+  index = index > 7 ? 0 : index * 2;
+  CompassPoint[0] = CompassPointList[index];
+  CompassPoint[1] = CompassPointList[index+1];
+}
+#endif
 
 //------------------ Battery Remaining Picture ----------------------------------
 

@@ -258,9 +258,13 @@ void OnMavlinkTimer()			// duration is up to approx. 10ms depending on choosen d
     if (rssi < -99) rssi = -99;
 #endif
 
-    setHeadingPatern();			// generate the heading patern
+#ifdef JR_SPECIALS
+    calculateCompassPoint();		// calculate the compass point which is shown in panHeading
+#endif
+
+    setHeadingPattern();		// generate the heading pattern
     setHomeVars(osd);			// calculate and set Distance from home and Direction to home
-    writePanels();				// writing enabled panels (check OSD_Panels Tab)
+    writePanels();			// writing enabled panels (check OSD_Panels Tab)
 }
 
 

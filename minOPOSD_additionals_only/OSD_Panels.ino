@@ -5,12 +5,12 @@
 /*
 
 refactoring started
-there is more refactoring necessary because there are too much side effects
 
 TODO:
 
 	refactor:
 		switchPanels
+		casts (double) -> (float) etc.
 	
 	maybe implement usage of panCallsign
 
@@ -563,7 +563,11 @@ void panClimb(int first_col, int first_line) {
 void panHeading(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+#ifdef JR_SPECIALS
+    osd.printf("%4.0f%c%s", (double)osd_heading, 0xb0, CompassPoint);
+#else
     osd.printf("%4.0f%c", (double)osd_heading, 0xb0);
+#endif
     osd.closePanel();
 }
 
