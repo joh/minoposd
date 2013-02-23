@@ -256,9 +256,9 @@ void OnMavlinkTimer()			// duration is up to approx. 10ms depending on choosen d
     }
     
     osd_heading = osd_heading > 360.0 ? 0.0 : osd_heading + 0.5;
-    osd_lat -= 0.000123;
-    osd_lon += 0.000123;
-    osd_alt += 0.1;
+    osd_lat -= 0.000012;
+    osd_lon += 0.000012;
+    osd_alt += 0.02;
 #endif
 
 #ifdef FLIGHT_BATT_ON_MINIMOSD
