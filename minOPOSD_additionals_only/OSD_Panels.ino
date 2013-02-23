@@ -696,7 +696,7 @@ void panBatteryPercent(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 #ifdef FLIGHT_BATT_ON_MINIMOSD
-    osd.printf("%6i%c", osd_total_A, 0x82);
+    osd.printf("%c%5i%c", 0xB9, osd_total_A, 0x82);
 #else
     osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
 #endif
