@@ -12,10 +12,10 @@ Home Distance	0	12	True
 WP Distance	18	0	False
 Altitude	22	2	False
 Home Altitude	0	13	True
-Climb Rate	2	15	True
+Climb Rate	0	15	True
 Battery Percent	22	14	True
 Current	22	15	True
-Velocity	2	14	True
+Velocity	0	14	True
 Air Speed	24	3	False
 Throttle	12	15	True
 Flight Mode	12	14	True
@@ -45,7 +45,7 @@ Home Altitude	0	14	True
 Climb Rate	2	15	False
 Battery Percent	22	15	True
 Current	23	15	False
-Velocity	2	15	True
+Velocity	0	15	True
 Air Speed	1	1	False
 Throttle	12	15	False
 Flight Mode	12	15	True
