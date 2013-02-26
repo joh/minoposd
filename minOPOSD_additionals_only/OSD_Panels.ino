@@ -854,71 +854,34 @@ void showArrow(uint8_t rotate_arrow) {
 }
 
 
-// Calculate and shows artificial horizon
-void showHorizon(int start_col, int start_row) { 
-
-    int x, nose, row, minval, hit, subval = 0;
-    const int cols = 12;
-    const int rows = 5;
-    int col_hit[cols];
-    float  pitch, roll;
-
-    (abs(osd_pitch) == 90) ? pitch = 89.99 * (90/osd_pitch) * -0.017453293 : pitch = osd_pitch * -0.017453293;
-    (abs(osd_roll)  == 90) ? roll =  89.99 * (90/osd_roll)  *  0.017453293 : roll =  osd_roll  *  0.017453293;
-
-    nose = round(tan(pitch) * (rows * 9));
-    for (int col=1; col<=cols; col++) {
-        x = (col * 12) - (cols * 6) - 6;				// center X point at middle of each col
-        col_hit[col-1] = (tan(roll) * x) + nose + (rows*9) - 1;		// calculating hit point on Y plus offset to eliminate negative values
-    }
-
-    for (int col=0; col<cols; col++) {
-        hit = col_hit[col];
-        if (hit > 0 && hit < (rows * 18)) {
-            row = rows - ((hit-1) / 18);
-            minval = rows * 18 - row * 18 + 1;
-            subval = hit - minval;
-            subval = round((subval * 9) / 18);
+// Calculate and show artificial horizon
+							// with different factors we can adapt do different cam optics
+#define AH_PITCH_FACTOR		0.017453293		// conversion factor for pitch
+#define AH_ROLL_FACTOR		0.017453293		// conversion factor for roll
+#define AH_COLS			12			// number of artificial horizon columns
+#define AH_ROWS			5			// number of artificial horizon rows
+#define CHAR_COLS		12			// number of MAX7456 char columns
+#define CHAR_ROWS		18			// number of MAX7456 char rows
+#define CHAR_SPECIAL		9			// number of MAX7456 special chars for the artificial horizon
+#define LINE_CODE		(0x06 - 1)		// code of the first MAX7456 special char -1
+#define AH_TOTAL_LINES		AH_ROWS * CHAR_ROWS
+#define AH_SPECIAL_LINES	AH_ROWS * CHAR_SPECIAL
+void showHorizon(int start_col, int start_row) {
+    int col, row, pitch_line, middle, hit, subval;
+    
+    pitch_line = round(tan(-AH_PITCH_FACTOR * osd_pitch) * AH_SPECIAL_LINES);
+    for (col=1; col<=AH_COLS; col++) {
+        middle = col * CHAR_COLS - (AH_COLS - 1) * CHAR_COLS/2;					// center X point at middle of each column
+        hit = tan(AH_ROLL_FACTOR * osd_roll) * middle + pitch_line + AH_SPECIAL_LINES - 1;	// calculating hit point on Y plus offset to eliminate negative values
+        if (hit > 0 && hit < AH_TOTAL_LINES) {
+            row = AH_ROWS - ((hit - 1) / CHAR_ROWS);
+            subval = hit - (AH_TOTAL_LINES - row * CHAR_ROWS + 1);
+            subval = round(subval * CHAR_SPECIAL / CHAR_ROWS);
             if (subval == 0) subval = 1;
-            printHit(start_col + col, start_row + row - 1, subval);
+            osd.openSingle(start_col + col - 1, start_row + row - 1);
+            osd.printf("%c", LINE_CODE + subval);
         }
     }
-}
-
-
-void printHit(byte col, byte row, byte subval) {
-    osd.openSingle(col, row);
-    char subval_char;
-        switch (subval) {
-        case 1:
-            subval_char = 0x06;
-            break;
-        case 2:
-            subval_char = 0x07; 
-            break;
-        case 3:
-            subval_char = 0x08;
-            break;
-        case 4:
-            subval_char = 0x09;
-            break;
-        case 5:
-            subval_char = 0x0a; 
-            break;
-        case 6:
-            subval_char = 0x0b;
-            break;
-        case 7:
-            subval_char = 0x0c;
-            break;
-        case 8:
-            subval_char = 0x0d;
-            break;
-        case 9:
-            subval_char = 0x0e;
-            break;
-        }
-        osd.printf("%c", subval_char);
 }
 
 
