@@ -435,7 +435,11 @@ void panLogo() {
 void panGPSats(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+#ifdef JR_SPECIALS	// I like it more this way
+    osd.printf("%c%3i", 0x0f, osd_satellites_visible);
+#else
     osd.printf("%c%2i", 0x0f, osd_satellites_visible);
+#endif
     osd.closePanel();
 }
 
@@ -443,18 +447,17 @@ void panGPSats(int first_col, int first_line) {
 /******************************************************************/
 // Panel  : panGPL
 // Needs  : X, Y locations
-// Output : 1 static symbol with changing FIX symbol
+// Output : 1 static symbol open lock or 2D or 3D sign
 /******************************************************************/
 void panGPL(int first_col, int first_line) {
-    char* gps_str;
-    
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if (osd_fix_type == 0 || osd_fix_type == 1) gps_str = "\x10\x20";
-    else if (osd_fix_type == 2 || osd_fix_type == 3) gps_str = "\x11\x20";
-    osd.printf("%s", gps_str);
+    if (osd_fix_type < 2)
+        osd.printf("0x10");
+    else
+        osd.printf("%c", osd_fix_type-1);
 #ifdef OP_DEBUG		// I use this place for debug info
-    osd.printf("%02x", op_alarm);
+    osd.printf(" %02x", op_alarm);
 #endif
     osd.closePanel();
 }
@@ -537,7 +540,11 @@ void panAlt(int first_col, int first_line) {
 void panVel(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+#ifdef JR_SPECIALS	// I like it more this way
+    osd.printf("%c%5.0f%c", 0xE9, (double)(osd_groundspeed * convert_speed), unit_speed);
+#else
     osd.printf("%c%3.0f%c", 0xE9, (double)(osd_groundspeed * convert_speed), unit_speed);
+#endif
     osd.closePanel();
 }
 
@@ -550,7 +557,11 @@ void panVel(int first_col, int first_line) {
 void panClimb(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+#ifdef JR_SPECIALS	// I like it more this way
+    osd.printf("%c%5.0f%c", 0x16, (double)(osd_climb), 0x88);
+#else
     osd.printf("%c%3.0f%c", 0x16, (double)(osd_climb), 0x88);
+#endif
     osd.closePanel();
 }
 
