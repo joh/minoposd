@@ -882,7 +882,7 @@ void showHorizon(int start_col, int start_row) {
     
     pitch_line = round(tan(-AH_PITCH_FACTOR * osd_pitch) * AH_SPECIAL_LINES);
     for (col=1; col<=AH_COLS; col++) {
-        middle = col * CHAR_COLS - (AH_COLS - 1) * CHAR_COLS/2;					// center X point at middle of each column
+        middle = col * CHAR_COLS - (AH_COLS * CHAR_COLS/2) - CHAR_COLS/2;			// center X point at middle of each column
         hit = tan(AH_ROLL_FACTOR * osd_roll) * middle + pitch_line + AH_SPECIAL_LINES - 1;	// calculating hit point on Y plus offset to eliminate negative values
         if (hit > 0 && hit < AH_TOTAL_LINES) {
             row = AH_ROWS - ((hit - 1) / CHAR_ROWS);
