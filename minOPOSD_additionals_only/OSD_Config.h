@@ -14,6 +14,14 @@
 //#define PACKETRXOK_ON_MINIMOSD
 // Amedee: Analog RSSI on MinimOSD:
 //#define ANALOG_RSSI_ON_MINIMOSD
+// JRChange: artificial horizon original version
+//#define AH_ORIGINAL_VERSION
+// JRChange: artificial horizon refactored version
+//#define AH_REFACTORED_VERSION
+// JRChange: artificial horizon zero centered
+//#define AH_ZERO_CENTERED
+// JRChange: artificial horizon with better resolution
+#define AH_BETTER_RESOLUTION
 // JRChange: JR specials
 //#define JR_SPECIALS
 // JRChange: OP debug

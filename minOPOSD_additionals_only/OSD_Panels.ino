@@ -258,19 +258,19 @@ void panWarn(int first_col, int first_line) {
                 case 1:						// DISARMED
 		    if (osd_armed < 2) {
 			warning_type = cycle;
-			warning_string = "  DISARMED  ";
+			warning_string = "  disarmed  ";
 		    }
                     break;
                 case 2:						// No telemetry communication
 		    if (uavtalk_state() != TELEMETRYSTATS_STATE_CONNECTED) {
 			warning_type = cycle;
-			warning_string = " NO TEL COM ";
+			warning_string = " no tel com ";
 		    }
                     break;
 		case 3:						// NO GPS FIX
                     if (osd_fix_type < 2 && osd_got_home) {	// to allow flying in the woods (what I really like) without this annoying warning,
 			warning_type = cycle;			// this warning is only shown if GPS was valid before (osd_got_home)
-			warning_string = " NO GPS FIX ";
+			warning_string = " no gps fix ";
 		    }
                     break;
                 case 4:						// BATT LOW
@@ -280,13 +280,13 @@ void panWarn(int first_col, int first_line) {
                     if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < batt_warn_level) {
 #endif
 			warning_type = cycle;
-			warning_string = "  BATT LOW  ";
+			warning_string = "  batt low  ";
 		    }
                     break;
                 case 5:						// RSSI LOW
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) {
 			warning_type = cycle;
-			warning_string = "  RSSI LOW  ";
+			warning_string = "  rssi low  ";
 		    }
                     break;
                 }
@@ -329,7 +329,7 @@ void panSetup() {
         osd.setPanel(5, 3);
         osd.openPanel();
 	
-        osd.printf_P(PSTR("Setup screen|||"));
+        osd.printf_P(PSTR("setup screen|||"));
 
         if (chan1_raw_middle == 0 || chan2_raw_middle == 0) {
             chan1_raw_middle = chan1_raw;
@@ -344,7 +344,7 @@ void panSetup() {
 
         switch (setup_menu) {
             case 2:
-                osd.printf_P(PSTR("Battery warning "));
+                osd.printf_P(PSTR("battery warning "));
                 osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);
                 battv = change_val(battv, battv_ADDR);
                 break;
@@ -355,7 +355,7 @@ void panSetup() {
 	        delta /= 10;
             case 3:
 	        // volt_div_ratio
-                osd.printf_P(PSTR("Calibrate||measured volt: "));
+                osd.printf_P(PSTR("calibrate||measured volt: "));
                 osd.printf("%c%5.2f%c", 0xE2, (float)osd_vbat_A, 0x8E);
                 osd.printf("||volt div ratio:  %5i", volt_div_ratio);
                 volt_div_ratio = change_int_val(volt_div_ratio, volt_div_ratio_ADDR, delta);
@@ -366,7 +366,7 @@ void panSetup() {
 	        delta /= 10;
 	    case 6:
 	        // curr_amp_offset
-                osd.printf_P(PSTR("Calibrate||measured amp:  "));
+                osd.printf_P(PSTR("calibrate||measured amp:  "));
                 osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
                 osd.printf("||amp offset:      %5i", curr_amp_offset);
                 curr_amp_offset = change_int_val(curr_amp_offset, curr_amp_offset_ADDR, delta);
@@ -377,7 +377,7 @@ void panSetup() {
 	        delta /= 10;
 	    case 9:
 		// curr_amp_per_volt
-                osd.printf_P(PSTR("Calibrate||measured amp:  "));
+                osd.printf_P(PSTR("calibrate||measured amp:  "));
                 osd.printf("%c%5.2f%c", 0xE2, osd_curr_A * .01, 0x8F);
                 osd.printf("||amp per volt:    %5i", curr_amp_per_volt);
                 curr_amp_per_volt = change_int_val(curr_amp_per_volt, curr_amp_per_volt_ADDR, delta);
@@ -400,7 +400,7 @@ void panSetup() {
 void panBoot(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf_P(PSTR("Booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3")); 
+    osd.printf_P(PSTR("booting up:\xed\xf2\xf2\xf2\xf2\xf2\xf2\xf2\xf3")); 
     osd.closePanel();
 }
 
@@ -413,15 +413,15 @@ void panBoot(int first_col, int first_line) {
 void panLogo() {
     osd.setPanel(3, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minOPOSD 1.2.1"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 1.3.0"));
 #ifdef PACKETRXOK_ON_MINIMOSD
-    osd.printf_P(PSTR(" PRxOk"));
+    osd.printf_P(PSTR(" prxok"));
 #endif
 #ifdef ANALOG_RSSI_ON_MINIMOSD
-    osd.printf_P(PSTR(" ARSSI"));
+    osd.printf_P(PSTR(" arssi"));
 #endif
 #ifdef JR_SPECIALS
-    osd.printf_P(PSTR(" JRS"));
+    osd.printf_P(PSTR(" jrs"));
 #endif
     osd.closePanel();
 }
@@ -865,7 +865,89 @@ void showArrow(uint8_t rotate_arrow) {
 }
 
 
-// Calculate and show artificial horizon
+#ifdef AH_ORIGINAL_VERSION
+
+// Calculate and shows Artificial Horizon
+void showHorizon(int start_col, int start_row) { 
+
+    int x, nose, row, minval, hit, subval = 0;
+    const int cols = 12;
+    const int rows = 5;
+    int col_hit[cols];
+    float  pitch, roll;
+
+    (abs(osd_pitch) == 90)?pitch = 89.99 * (90/osd_pitch) * -0.017453293:pitch = osd_pitch * -0.017453293;
+    (abs(osd_roll) == 90)?roll = 89.99 * (90/osd_roll) * 0.017453293:roll = osd_roll * 0.017453293;
+
+    nose = round(tan(pitch) * (rows*9));
+    for(int col=1;col <= cols;col++){
+        x = (col * 12) - (cols * 6) - 6;//center X point at middle of each col
+        col_hit[col-1] = (tan(roll) * x) + nose + (rows*9) - 1;//calculating hit point on Y plus offset to eliminate negative values
+        //col_hit[(col-1)] = nose + (rows * 9);
+    }
+
+    for(int col=0;col < cols; col++){
+        hit = col_hit[col];
+        if(hit > 0 && hit < (rows * 18)){
+            row = rows - ((hit-1)/18);
+            minval = rows*18 - row*18 + 1;
+            subval = hit - minval;
+            subval = round((subval*9)/18);
+            if(subval == 0) subval = 1;
+            printHit(start_col + col, start_row + row - 1, subval);
+        }
+    }
+}
+
+void printHit(byte col, byte row, byte subval){
+    osd.openSingle(col, row);
+    char subval_char;
+        switch (subval){
+        case 1:
+            //osd.printf_P(PSTR("\x06"));
+            subval_char = 0x06;
+            break;
+        case 2:
+            //osd.printf_P(PSTR("\x07"));
+            subval_char = 0x07; 
+            break;
+        case 3:
+            //osd.printf_P(PSTR("\x08"));
+            subval_char = 0x08;
+            break;
+        case 4:
+            //osd.printf_P(PSTR("\x09"));
+            subval_char = 0x09;
+            break;
+        case 5:
+            //osd.printf_P(PSTR("\x0a"));
+            subval_char = 0x0a; 
+            break;
+        case 6:
+            //osd.printf_P(PSTR("\x0b"));
+            subval_char = 0x0b;
+            break;
+        case 7:
+            //osd.printf_P(PSTR("\x0c"));
+            subval_char = 0x0c;
+            break;
+        case 8:
+            //osd.printf_P(PSTR("\x0d"));
+            subval_char = 0x0d;
+            break;
+        case 9:
+            //osd.printf_P(PSTR("\x0e"));
+            subval_char = 0x0e;
+            break;
+        }
+        osd.printf("%c", subval_char);
+
+}
+
+#endif // AH_ORIGINAL_VERSION
+
+
+#ifdef AH_REFACTORED_VERSION
 							// with different factors we can adapt do different cam optics
 #define AH_PITCH_FACTOR		0.017453293		// conversion factor for pitch
 #define AH_ROLL_FACTOR		0.017453293		// conversion factor for roll
@@ -877,6 +959,8 @@ void showArrow(uint8_t rotate_arrow) {
 #define LINE_CODE		(0x06 - 1)		// code of the first MAX7456 special char -1
 #define AH_TOTAL_LINES		AH_ROWS * CHAR_ROWS
 #define AH_SPECIAL_LINES	AH_ROWS * CHAR_SPECIAL
+
+// Calculate and show artificial horizon
 void showHorizon(int start_col, int start_row) {
     int col, row, pitch_line, middle, hit, subval;
     
@@ -894,6 +978,133 @@ void showHorizon(int start_col, int start_row) {
         }
     }
 }
+
+#endif // AH_REFACTORED_VERSION
+
+
+#ifdef AH_ZERO_CENTERED
+
+// For using this, you must load a special mcm file where the artificial horizon zero left/right arrows are centered!
+// e.g. AH_ZeroCentered002.mcm
+							// with different factors we can adapt do different cam optics
+#define AH_PITCH_FACTOR		0.010471976		// conversion factor for pitch
+#define AH_ROLL_FACTOR		0.017453293		// conversion factor for roll
+#define AH_COLS			12			// number of artificial horizon columns
+#define AH_ROWS			5			// number of artificial horizon rows
+#define CHAR_COLS		12			// number of MAX7456 char columns
+#define CHAR_ROWS		18			// number of MAX7456 char rows
+#define CHAR_SPECIAL		9			// number of MAX7456 special chars for the artificial horizon
+#define LINE_CODE		(0x06 - 1)		// code of the first MAX7456 special char -1
+#define AH_TOTAL_LINES		AH_ROWS * CHAR_ROWS
+
+// Calculate and show artificial horizon
+// used formula: y = m * x + n <=> y = tan(a) * x + n
+void showHorizon(int start_col, int start_row) {
+    int col, row, pitch_line, middle, hit, subval;
+    
+    pitch_line = round(tan(-AH_PITCH_FACTOR * osd_pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;	// 90 total lines
+    for (col=1; col<=AH_COLS; col++) {
+        middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
+        hit = tan(AH_ROLL_FACTOR * osd_roll) * middle + pitch_line;	          // 1 to 90	calculating hit point on Y plus offset
+        if (hit >= 1 && hit <= AH_TOTAL_LINES) {
+	    row = (hit-1) / CHAR_ROWS;						  // 1 to 5 bottom-up
+	    subval = (hit - (row * CHAR_ROWS) + 1) / (CHAR_ROWS / CHAR_SPECIAL);  // 1 to 9
+            osd.openSingle(start_col + col - 1, start_row + AH_ROWS - row - 1);
+            osd.printf("%c", LINE_CODE + subval);
+        }
+    }
+}
+
+#endif // AH_ZERO_CENTERED
+
+
+#ifdef AH_BETTER_RESOLUTION
+
+// For using this, you must load a special mcm file with the new staggered artificial horizon chars!
+// e.g. AH_BetterResolutionCharset002.mcm
+							// with different factors we can adapt do different cam optics
+#define AH_PITCH_FACTOR		0.010471976		// conversion factor for pitch
+#define AH_ROLL_FACTOR		0.017453293		// conversion factor for roll
+#define AH_COLS			12			// number of artificial horizon columns
+#define AH_ROWS			5			// number of artificial horizon rows
+#define CHAR_COLS		12			// number of MAX7456 char columns
+#define CHAR_ROWS		18			// number of MAX7456 char rows
+#define CHAR_SPECIAL		9			// number of MAX7456 special chars for the artificial horizon
+#define AH_TOTAL_LINES		AH_ROWS * CHAR_ROWS	// helper define
+
+#define LINE_SET_STRAIGHT__	(0x06 - 1)		// code of the first MAX7456 straight char -1
+#define LINE_SET_STRAIGHT_O	(0x3B - 3)		// code of the first MAX7456 straight overflow char -3
+#define LINE_SET_P___STAG_1	(0x3C - 1)		// code of the first MAX7456 positive staggered set 1 char -1
+#define LINE_SET_P___STAG_2	(0x45 - 1)		// code of the first MAX7456 positive staggered set 2 char -1
+#define LINE_SET_N___STAG_1	(0x4E - 1)		// code of the first MAX7456 negative staggered set 1 char -1
+#define LINE_SET_N___STAG_2	(0x57 - 1)		// code of the first MAX7456 negative staggered set 2 char -1
+#define LINE_SET_P_O_STAG_1	(0xD4 - 2)		// code of the first MAX7456 positive overflow staggered set 1 char -2
+#define LINE_SET_P_O_STAG_2	(0xDA - 1)		// code of the first MAX7456 positive overflow staggered set 2 char -1
+#define LINE_SET_N_O_STAG_1	(0xD6 - 2)		// code of the first MAX7456 negative overflow staggered set 1 char -2
+#define LINE_SET_N_O_STAG_2	(0xDD - 1)		// code of the first MAX7456 negative overflow staggered set 2 char -1
+
+#define OVERFLOW_CHAR_OFFSET	6			// offset for the overflow subvals
+
+#define ANGLE_1			9			// angle above we switch to line set 1
+#define ANGLE_2			25			// angle above we switch to line set 2
+
+// Calculate and show artificial horizon
+// used formula: y = m * x + n <=> y = tan(a) * x + n
+void showHorizon(int start_col, int start_row) {
+    int col, row, pitch_line, middle, hit, subval;
+    int roll;
+    int line_set = LINE_SET_STRAIGHT__;
+    int line_set_overflow = LINE_SET_STRAIGHT_O;
+    int subval_overflow = 9;
+    
+    // preset the line char attributes
+    roll = osd_roll;
+    if ((roll >= 0 && roll < 90) || (roll >= -179 && roll < -90)) {	// positive angle line chars
+	roll = roll < 0 ? roll + 179 : roll;
+        if (abs(roll) > ANGLE_2) {
+	    line_set = LINE_SET_P___STAG_2;
+	    line_set_overflow = LINE_SET_P_O_STAG_2;
+            subval_overflow = 7;
+	} else if (abs(roll) > ANGLE_1) {
+	    line_set = LINE_SET_P___STAG_1;
+	    line_set_overflow = LINE_SET_P_O_STAG_1;
+            subval_overflow = 8;
+	}
+    } else {								// negative angle line chars
+	roll = roll > 90 ? roll - 179 : roll;
+        if (abs(roll) > ANGLE_2) {
+	    line_set = LINE_SET_N___STAG_2;
+	    line_set_overflow = LINE_SET_N_O_STAG_2;
+            subval_overflow = 7;
+	} else if (abs(roll) > ANGLE_1) {
+	    line_set = LINE_SET_N___STAG_1;
+	    line_set_overflow = LINE_SET_N_O_STAG_1;
+            subval_overflow = 8;
+	}
+    }
+    
+    pitch_line = round(tan(-AH_PITCH_FACTOR * osd_pitch) * AH_TOTAL_LINES) + AH_TOTAL_LINES/2;	// 90 total lines
+    for (col=1; col<=AH_COLS; col++) {
+        middle = col * CHAR_COLS - (AH_COLS/2 * CHAR_COLS) - CHAR_COLS/2;	  // -66 to +66	center X point at middle of each column
+        hit = tan(AH_ROLL_FACTOR * osd_roll) * middle + pitch_line;	          // 1 to 90	calculating hit point on Y plus offset
+        if (hit >= 1 && hit <= AH_TOTAL_LINES) {
+	    row = (hit-1) / CHAR_ROWS;						  // 0 to 4 bottom-up
+	    subval = (hit - (row * CHAR_ROWS) + 1) / (CHAR_ROWS / CHAR_SPECIAL);  // 1 to 9
+	    
+	    // print the line char
+            osd.openSingle(start_col + col - 1, start_row + AH_ROWS - row - 1);
+            osd.printf("%c", line_set + subval);
+	    
+	    // check if we had to print an overflow line char
+	    if (subval >= subval_overflow && row < 4) {	// only if it is a char which needs overflow and if it is not the upper most row
+                osd.openSingle(start_col + col - 1, start_row + AH_ROWS - row - 2);
+                osd.printf("%c", line_set_overflow + subval - OVERFLOW_CHAR_OFFSET);
+	    }
+        }
+    }
+}
+
+#endif // AH_BETTER_RESOLUTION
 
 
 void set_converts() {
