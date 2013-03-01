@@ -453,7 +453,7 @@ void panGPL(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     if (osd_fix_type < 2)
-        osd.printf("0x10");
+        osd.printf_P(PSTR("\x10"));
     else
         osd.printf("%c", osd_fix_type-1);
 #ifdef OP_DEBUG		// I use this place for debug info
@@ -824,13 +824,13 @@ int change_int_val(int value, int address, int delta) {
     osd.printf_P(PSTR("|                   "));
     switch (delta) {
         case 100:
-            osd.printf_P(PSTR("\x5E"));
+            osd.printf_P(PSTR("\xBF"));
 	break;
         case 10:
-            osd.printf_P(PSTR(" \x5E"));
+            osd.printf_P(PSTR(" \xBF"));
 	break;
         case 1:
-            osd.printf_P(PSTR("  \x5E"));
+            osd.printf_P(PSTR("  \xBF"));
 	break;
     }
 		
@@ -1095,7 +1095,7 @@ void showHorizon(int start_col, int start_row) {
             osd.openSingle(start_col + col - 1, start_row + AH_ROWS - row - 1);
             osd.printf("%c", line_set + subval);
 	    
-	    // check if we had to print an overflow line char
+	    // check if we have to print an overflow line char
 	    if (subval >= subval_overflow && row < 4) {	// only if it is a char which needs overflow and if it is not the upper most row
                 osd.openSingle(start_col + col - 1, start_row + AH_ROWS - row - 2);
                 osd.printf("%c", line_set_overflow + subval - OVERFLOW_CHAR_OFFSET);
