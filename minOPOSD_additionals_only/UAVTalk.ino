@@ -331,7 +331,6 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 int uavtalk_read(void) {
 	static uint8_t crlf_count = 0;
 	static uavtalk_message_t msg;
-	uint8_t response = UAVTALK_TYPE_NACK;
 	uint8_t show_prio_info = 0;
 	
 	// grabbing data
@@ -355,7 +354,6 @@ int uavtalk_read(void) {
 			// consume msg
 			switch (msg.ObjID) {
 				case FLIGHTTELEMETRYSTATS_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
 					switch (msg.Data[FLIGHTTELEMETRYSTATS_OBJ_STATUS]) {
 						case TELEMETRYSTATS_STATE_DISCONNECTED:
 							gcstelemetrystatus = TELEMETRYSTATS_STATE_HANDSHAKEREQ;
@@ -372,7 +370,6 @@ int uavtalk_read(void) {
 					}
 				break;
 				case ATTITUDEACTUAL_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
 					last_flighttelemetry_connect = millis();
 					show_prio_info = 1;
         				osd_roll		= (int16_t) uavtalk_get_float(&msg, ATTITUDEACTUAL_OBJ_ROLL);
@@ -384,12 +381,10 @@ int uavtalk_read(void) {
                                         }
 				break;
 				case FLIGHTSTATUS_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
         				osd_armed		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_ARMED);
         				osd_mode		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_FLIGHTMODE);
 				break;
 				case MANUALCONTROLCOMMAND_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
 					osd_throttle		= (int16_t) (100.0 * uavtalk_get_float(&msg, MANUALCONTROLCOMMAND_OBJ_THROTTLE));
 					if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
 					// Channel mapping:
@@ -409,9 +404,8 @@ int uavtalk_read(void) {
 					osd_chan7_raw		= uavtalk_get_int16(&msg, MANUALCONTROLCOMMAND_OBJ_CHANNEL_7);
 					osd_chan8_raw		= uavtalk_get_int16(&msg, MANUALCONTROLCOMMAND_OBJ_CHANNEL_8);
 				break;
-				case GPSPOSITION_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
 #ifndef GPS_SIMULATION
+				case GPSPOSITION_OBJID:
 					osd_lat			= uavtalk_get_int32(&msg, GPSPOSITION_OBJ_LAT) / 10000000.0;
 					osd_lon			= uavtalk_get_int32(&msg, GPSPOSITION_OBJ_LON) / 10000000.0;
 					osd_satellites_visible	= uavtalk_get_int8(&msg, GPSPOSITION_OBJ_SATELLITES);
@@ -419,26 +413,25 @@ int uavtalk_read(void) {
 					osd_heading		= uavtalk_get_float(&msg, GPSPOSITION_OBJ_HEADING);
 					osd_alt			= uavtalk_get_float(&msg, GPSPOSITION_OBJ_ALTITUDE);
 					osd_groundspeed		= uavtalk_get_float(&msg, GPSPOSITION_OBJ_GROUNDSPEED);
-#endif
 				break;
-				// because of #define PIOS_GPS_MINIMAL in the OP flight code, the following is unfortunately currently not supported:
+#endif
+// because of #define PIOS_GPS_MINIMAL in the OP flight code, the following is unfortunately currently not supported:
+#if 0
 				case GPSTIME_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
         				osd_time_hour		= uavtalk_get_int8(&msg, GPSTIME_OBJ_HOUR);
         				osd_time_minute		= uavtalk_get_int8(&msg, GPSTIME_OBJ_MINUTE);
 				break;
+#endif
 				case GPSVELOCITY_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
 					osd_climb		= -1.0 * uavtalk_get_float(&msg, GPSVELOCITY_OBJ_DOWN);
 				break;
-				case SYSTEMALARMS_OBJID:
-                                        response = UAVTALK_TYPE_ACK;
 #ifdef OP_DEBUG
+				case SYSTEMALARMS_OBJID:
 					op_alarm  = msg.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
 					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
 					if (op_alarm > 0x11) show_prio_info = 1;
-#endif
 				break;
+#endif
 				
 				// TODO implement more X_OBJID for more OSD data 
 				// osd_waypoint_seq = 0;           // waypoint sequence
@@ -446,7 +439,7 @@ int uavtalk_read(void) {
 				// etc.
 			}
 			if (msg.MsgType == UAVTALK_TYPE_OBJ_ACK) {
-				uavtalk_respond_object(&msg, response);
+				uavtalk_respond_object(&msg, UAVTALK_TYPE_ACK);
 			}
 		}
 
