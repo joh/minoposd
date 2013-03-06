@@ -87,13 +87,9 @@ void writePanels() {
     if (setup_menu_active) {
         panSetup();
     } else {
+        if (ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);					// ever check/display warnings
         if (panel < npanels) {											// first or second panel
             if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
-#ifdef JR_SPECIALS
-						// UAV position radar has low showing priority, other panel content will overwrite it
-            if (ISc(panel,Hor_BIT))		panUAVPosition(panHorizon_XY[0][panel] + 6, panHorizon_XY[1][panel] + 2);
-#endif
-	    
 	    // these GPS related panels are active under all circumstances
             if (ISa(panel,GPSats_BIT))		panGPSats(panGPSats_XY[0][panel], panGPSats_XY[1][panel]);	// number of visible sats
             if (ISa(panel,GPL_BIT))		panGPL(panGPL_XY[0][panel], panGPL_XY[1][panel]);		// sat fix type
@@ -124,8 +120,11 @@ void writePanels() {
             if (ISc(panel,CurA_BIT))		panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
             if (ISa(panel,Bp_BIT))		panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]);
             if (ISb(panel,Time_BIT))		panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
+	    
+#ifdef JR_SPECIALS
+            if (ISc(panel,Hor_BIT))		panUAVPosition(panHorizon_XY[0][panel] + 6, panHorizon_XY[1][panel] + 2);
+#endif
 	}
-        if (ISd(0,Warn_BIT)) panWarn(panWarn_XY[0][0], panWarn_XY[1][0]);					// ever check/display warnings
     }
 
 #ifdef membug
@@ -774,23 +773,28 @@ void panHorizon(int first_col, int first_line) {
 // Needs  : X, Y locations of center
 // Needs  : globals: osd_home_lat, osd_lat, osd_home_lon, osd_lon
 // Output : shows the UAV position in a radar like style
-// Status : just an idea and not to forget
-//          not compiled
-//          not tested
-//          not ready
+// Status : do flight test
 /******************************************************************/
 
 #define	STEP_WIDTH	250			// every STEP_WIDTH in [m] it is down-scaled
-#define	SCALE_X		(12.0 / STEP_WIDTH)	// SCALE_X * 2 chars grid in which the uav is drawed
-#define	SCALE_Y		( 7.0 / STEP_WIDTH)	// SCALE_Y * 2 chars grid in which the uav is drawed
+#define	SCALE_X		( 7.0 / STEP_WIDTH)	// SCALE_X * 2 chars grid in which the uav is drawed
+#define	SCALE_Y		( 4.5 / STEP_WIDTH)	// SCALE_Y * 2 chars grid in which the uav is drawed
 
 void panUAVPosition(int center_col, int center_line) {
+    static int last_x = 0;
+    static int last_y = 0;
+    
     // distances from home in lat (y) and lon (x) direction in [m]
     int dy = (int)(111319.5 * (osd_home_lat - osd_lat));
     int dx = (int)(111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
     // display offset in y and x direction
     int y = (int)(dy / (((int)(abs(dy) / STEP_WIDTH) + 1) / SCALE_Y));
     int x = (int)(dx / (((int)(abs(dx) / STEP_WIDTH) + 1) / SCALE_X));
+    // clear UAV
+    osd.openSingle(center_col - last_x, center_line + last_y);
+    osd.printf_P(PSTR(" "));
+    last_x = x;
+    last_y = y;
     // print UAV
     osd.openSingle(center_col - x, center_line + y);
     osd.printf_P(PSTR("\xF4"));
