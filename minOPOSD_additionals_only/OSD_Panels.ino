@@ -786,6 +786,7 @@ void panHorizon(int first_col, int first_line) {
 
 #define USE_DIRECTED				// choose to use directed UAV icons (special mcm file needed)
 #define UAV_CHAR_START	0x17			// code of the first of 8 directed UAV icons
+#define ZOOM_CHAR	0xF4			// code of the zoom symbol
 
 void panUAVPosition(int center_col, int center_line) {
     static int last_x = 0;
@@ -797,12 +798,17 @@ void panUAVPosition(int center_col, int center_line) {
     index = index > 7 ? 0 : index;
 #endif
     
-    // distances from home in lat (y) and lon (x) direction in [m]
+    // calculate distances from home in lat (y) and lon (x) direction in [m]
     int dy = (int)(111319.5 * (osd_home_lat - osd_lat));
     int dx = (int)(111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
-    // display offset in y and x direction
-    int y = (int)(dy / (((int)(abs(dy) / STEP_WIDTH) + 1) / SCALE_Y));
-    int x = (int)(dx / (((int)(abs(dx) / STEP_WIDTH) + 1) / SCALE_X));
+    // calculate display offset in y and x direction
+    int zoom = max(((int)(abs(dy) / STEP_WIDTH) + 1), ((int)(abs(dx) / STEP_WIDTH) + 1));
+    osd.setPanel(center_col + 14, center_line + 2);
+    osd.openPanel();
+    osd.printf("%2i%c", zoom, ZOOM_CHAR);
+    osd.closePanel();
+    int y = (int)(dy / (zoom / SCALE_Y));
+    int x = (int)(dx / (zoom / SCALE_X));
     // clear UAV
     osd.openSingle(center_col - last_x, center_line + last_y);
     osd.printf_P(PSTR(" "));
