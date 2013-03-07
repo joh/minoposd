@@ -784,9 +784,18 @@ void panHorizon(int first_col, int first_line) {
 #define	SCALE_X		( 7.0 / STEP_WIDTH)	// SCALE_X * 2 chars grid in which the uav is drawed
 #define	SCALE_Y		( 4.5 / STEP_WIDTH)	// SCALE_Y * 2 chars grid in which the uav is drawed
 
+#define USE_DIRECTED				// choose to use directed UAV icons (special mcm file needed)
+#define UAV_CHAR_START	0x17			// code of the first of 8 directed UAV icons
+
 void panUAVPosition(int center_col, int center_line) {
     static int last_x = 0;
     static int last_y = 0;
+    
+#ifdef USE_DIRECTED
+    int index;
+    index = (int)((osd_heading + 22.5) / 45.0);
+    index = index > 7 ? 0 : index;
+#endif
     
     // distances from home in lat (y) and lon (x) direction in [m]
     int dy = (int)(111319.5 * (osd_home_lat - osd_lat));
@@ -799,10 +808,14 @@ void panUAVPosition(int center_col, int center_line) {
     osd.printf_P(PSTR(" "));
     last_x = x;
     last_y = y;
-    // print UAV
+    // show UAV
     osd.openSingle(center_col - x, center_line + y);
+#ifdef USE_DIRECTED
+    osd.printf("%c", UAV_CHAR_START + index);
+#else
     osd.printf_P(PSTR("\xF4"));
-    // print home
+#endif
+    // show home
     osd.setPanel(center_col, center_line);
     osd.openPanel();
     osd.printf_P(PSTR("\xF5\xF6"));
