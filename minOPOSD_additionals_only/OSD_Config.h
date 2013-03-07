@@ -22,6 +22,8 @@
 //#define AH_ZERO_CENTERED
 // JRChange: artificial horizon with better resolution
 #define AH_BETTER_RESOLUTION
+// JRChange: show_radar
+//#define SHOW_RADAR
 // JRChange: JR specials
 //#define JR_SPECIALS
 // JRChange: OP debug
