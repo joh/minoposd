@@ -803,7 +803,7 @@ void panUAVPosition(int center_col, int center_line) {
     int dx = (int)(111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
     // calculate display offset in y and x direction
     int zoom = max(((int)(abs(dy) / STEP_WIDTH) + 1), ((int)(abs(dx) / STEP_WIDTH) + 1));
-    osd.setPanel(center_col + 14, center_line + 2);
+    osd.setPanel(center_col + 8, center_line);
     osd.openPanel();
     osd.printf("%2i%c", zoom, ZOOM_CHAR);
     osd.closePanel();
