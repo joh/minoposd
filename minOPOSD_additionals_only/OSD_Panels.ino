@@ -780,13 +780,15 @@ void panHorizon(int first_col, int first_line) {
 // Status : do flight test
 /******************************************************************/
 
-#define	STEP_WIDTH	250			// every STEP_WIDTH in [m] it is down-scaled
-#define	SCALE_X		( 7.0 / STEP_WIDTH)	// SCALE_X * 2 chars grid in which the uav is drawed
-#define	SCALE_Y		( 4.5 / STEP_WIDTH)	// SCALE_Y * 2 chars grid in which the uav is drawed
+#define USE_DIRECTED				// use directed UAV icons (special mcm file needed)
 
-#define USE_DIRECTED				// choose to use directed UAV icons (special mcm file needed)
+#define	STEP_WIDTH	250			// every STEP_WIDTH in [m] it is down-scaled
+
+#define	SCALE_X		(7.0 / STEP_WIDTH)	// SCALE_X * 2 chars grid in which the uav is drawed
+#define	SCALE_Y		(4.5 / STEP_WIDTH)	// SCALE_Y * 2 chars grid in which the uav is drawed
+
+#define RADAR_CHAR	0xF9			// code of the radar symbol
 #define UAV_CHAR_START	0x17			// code of the first of 8 directed UAV icons
-#define ZOOM_CHAR	0xF4			// code of the zoom symbol
 
 void panUAVPosition(int center_col, int center_line) {
     static int last_x = 0;
@@ -799,23 +801,27 @@ void panUAVPosition(int center_col, int center_line) {
 #endif
     
     // calculate distances from home in lat (y) and lon (x) direction in [m]
-    int dy = (int)(111319.5 * (osd_home_lat - osd_lat));
-    int dx = (int)(111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
+    int dy = (int)(-111319.5 * (osd_home_lat - osd_lat));
+    int dx = (int)(-111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
+    
     // calculate display offset in y and x direction
-    int zoom = max(((int)(abs(dy) / STEP_WIDTH) + 1), ((int)(abs(dx) / STEP_WIDTH) + 1));
+    int zoom = max((int)(abs(dy) / STEP_WIDTH), (int)(abs(dx) / STEP_WIDTH));
     osd.setPanel(center_col + 8, center_line);
     osd.openPanel();
-    osd.printf("%2i%c", zoom, ZOOM_CHAR);
+    osd.printf("%c%5i%c", RADAR_CHAR, (int)((zoom+1) * STEP_WIDTH * convert_length), unit_length);
     osd.closePanel();
-    int y = (int)(dy / (zoom / SCALE_Y));
-    int x = (int)(dx / (zoom / SCALE_X));
+
+    zoom++;
+    int y = (int)( dy / (zoom / SCALE_Y));
+    int x = (int)((dx / (zoom / SCALE_X)) + 0.5);	// for even grid correction
+
     // clear UAV
-    osd.openSingle(center_col - last_x, center_line + last_y);
+    osd.openSingle(center_col + last_x, center_line - last_y);
     osd.printf_P(PSTR(" "));
     last_x = x;
     last_y = y;
     // show UAV
-    osd.openSingle(center_col - x, center_line + y);
+    osd.openSingle(center_col + x, center_line - y);
 #ifdef USE_DIRECTED
     osd.printf("%c", UAV_CHAR_START + index);
 #else
