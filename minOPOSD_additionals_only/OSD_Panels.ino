@@ -122,7 +122,10 @@ void writePanels() {
 	    
             if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
 #ifdef SHOW_RADAR
-            if (ISc(panel,Hor_BIT))		panUAVPosition(panHorizon_XY[0][panel] + 6, panHorizon_XY[1][panel] + 2);
+	    // these GPS related panels are active if GPS was valid before
+	    if (osd_got_home) {
+                if (ISc(panel,Hor_BIT))		panUAVPosition(panHorizon_XY[0][panel] + 6, panHorizon_XY[1][panel] + 2);
+	    }
 #endif
 	}
     }
@@ -456,10 +459,7 @@ void panGPSats(int first_col, int first_line) {
 void panGPL(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    if (osd_fix_type < 2)
-        osd.printf_P(PSTR("\x10"));
-    else
-        osd.printf("%c", osd_fix_type-1);
+    osd.printf("%c", osd_fix_type<=1 ? osd_fix_type*0x10 : osd_fix_type-1);
 #ifdef OP_DEBUG		// I use this place for debug info
     osd.printf(" %02x", op_alarm);
 #endif
@@ -759,11 +759,7 @@ void panHorizon(int first_col, int first_line) {
     osd.openPanel();
     osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
     osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
-#ifdef SHOW_RADAR
-    osd.printf_P(PSTR("\xd8\x20\x20\x20\x20\x20\xF5\xF6\x20\x20\x20\x20\x20\xd9|"));
-#else
     osd.printf_P(PSTR("\xd8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xd9|"));
-#endif
     osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9|"));
     osd.printf_P(PSTR("\xc8\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc9"));
     osd.closePanel();
@@ -805,15 +801,13 @@ void panUAVPosition(int center_col, int center_line) {
     int dx = (int)(-111319.5 * (osd_home_lon - osd_lon) * cos(fabs(osd_home_lat) * 0.0174532925));
     
     // calculate display offset in y and x direction
-    int zoom = max((int)(abs(dy) / STEP_WIDTH), (int)(abs(dx) / STEP_WIDTH));
+    int zoom = max((int)(abs(dy) / STEP_WIDTH), (int)(abs(dx) / STEP_WIDTH)) + 1;
     osd.setPanel(center_col + 8, center_line);
     osd.openPanel();
-    osd.printf("%c%5i%c", RADAR_CHAR, (int)((zoom+1) * STEP_WIDTH * convert_length), unit_length);
+    osd.printf("%c%5i%c", RADAR_CHAR, (int)(zoom * STEP_WIDTH * convert_length), unit_length);
     osd.closePanel();
-
-    zoom++;
-    int y = (int)( dy / (zoom / SCALE_Y));
-    int x = (int)((dx / (zoom / SCALE_X)) + 0.5);	// for even grid correction
+    int y = (int)(dy / (zoom / SCALE_Y));
+    int x = (int)(dx / (zoom / SCALE_X) + 0.5);	// for even grid correction
 
     // clear UAV
     osd.openSingle(center_col + last_x, center_line - last_y);
