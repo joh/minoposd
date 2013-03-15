@@ -144,6 +144,8 @@ typedef enum {
 
 
 
+#define	UAVTALK_MODE_PASSIVE				0x01	// do not send any UAVTalk packets
+
 #define	FLIGHTTELEMETRYSTATS_CONNECT_TIMEOUT		10000
 #define	GCSTELEMETRYSTATS_SEND_PERIOD			1000
 

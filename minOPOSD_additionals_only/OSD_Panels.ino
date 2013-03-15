@@ -34,7 +34,7 @@ TODO:
 
 #define SETUP_TIME		30000	// [ms]	time after boot while we can enter the setup menu
 #define SETUP_DEBOUNCE_TIME	500	// [ms]	time for RC-TX stick debouncing
-#define SETUP_LOWEST_MENU	2	//	lowest shown setup menue item
+#define SETUP_LOWEST_MENU	1	//	lowest shown setup menue item
 #ifndef FLIGHT_BATT_ON_MINIMOSD
 #define SETUP_HIGHEST_MENU	2	//	highest shown setup menue item
 #else
@@ -350,6 +350,18 @@ void panSetup() {
         else if (setup_menu > SETUP_HIGHEST_MENU) setup_menu = SETUP_HIGHEST_MENU;
 
         switch (setup_menu) {
+            case 1:
+                osd.printf_P(PSTR("uavtalk "));
+		if (op_uavtalk_mode & UAVTALK_MODE_PASSIVE) {
+			osd.printf_P(PSTR("passive"));
+			if (chan1_raw < chan1_raw_middle - PWM_OFFSET)
+				op_uavtalk_mode &= ~UAVTALK_MODE_PASSIVE;
+		} else {
+			osd.printf_P(PSTR("active "));
+			if (chan1_raw > chan1_raw_middle + PWM_OFFSET)
+				op_uavtalk_mode |= UAVTALK_MODE_PASSIVE;
+		}
+                break;
             case 2:
                 osd.printf_P(PSTR("battery warning "));
                 osd.printf("%3.1f%c", float(battv)/10.0 , 0x76, 0x20);

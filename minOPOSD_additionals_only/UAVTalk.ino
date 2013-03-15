@@ -145,6 +145,9 @@ void uavtalk_send_msg(uavtalk_message_t *msg) {
 	uint8_t i;
 	uint8_t c;
 	
+	if (op_uavtalk_mode & UAVTALK_MODE_PASSIVE)
+		return;
+	
 	c = (uint8_t) (msg->Sync);
 	Serial.write(c);
 	msg->Crc = crc_table[0 ^ c];

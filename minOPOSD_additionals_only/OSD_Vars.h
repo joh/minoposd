@@ -49,6 +49,7 @@ static long         osd_home_distance = 0;          // distance from home
 static uint8_t      osd_home_direction;             // arrow direction pointing to home (1-16 to CW loop)
 
 // OpenPilot UAVTalk:
+static uint8_t      op_uavtalk_mode = 0;            // OP UAVTalk mode, start with normal behavior
 static uint8_t      op_alarm = 0;                   // OP alarm info
 static uint8_t      osd_armed = 0;                  // OP armed info
 static uint8_t      osd_time_hour = 0;              // OP GPS time hour info
