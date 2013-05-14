@@ -384,6 +384,10 @@ int uavtalk_read(void) {
                                         }
 				break;
 				case FLIGHTSTATUS_OBJID:
+#ifdef VERSION_UNRELEASED_NEXT_ADDITIONAL
+				case FLIGHTSTATUS_OBJID_001:
+				case FLIGHTSTATUS_OBJID_002:
+#endif
         				osd_armed		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_ARMED);
         				osd_mode		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_FLIGHTMODE);
 				break;
@@ -428,8 +432,18 @@ int uavtalk_read(void) {
 				case GPSVELOCITY_OBJID:
 					osd_climb		= -1.0 * uavtalk_get_float(&msg, GPSVELOCITY_OBJ_DOWN);
 				break;
+#ifdef REVO_ADD_ONS
+				case OPLINKSTATUS_OBJID:
+        				oplm_rssi		= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_RSSI);
+        				oplm_linkquality	= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_LINKQUALITY);
+				break;
+#endif
 #ifdef OP_DEBUG
 				case SYSTEMALARMS_OBJID:
+#ifdef VERSION_UNRELEASED_NEXT_ADDITIONAL
+				case SYSTEMALARMS_OBJID_001:
+				case SYSTEMALARMS_OBJID_002:
+#endif
 					op_alarm  = msg.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
 					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
 					if (op_alarm > 0x11) show_prio_info = 1;

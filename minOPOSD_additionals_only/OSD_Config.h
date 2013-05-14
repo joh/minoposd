@@ -30,6 +30,11 @@
 //#define OP_DEBUG
 // JRChange: GPS simulation
 //#define GPS_SIMULATION
+// OpenPilot 'NEXT' additional for unreleased 'NEXT' version
+//#define VERSION_UNRELEASED_NEXT_ADDITIONAL
+// OpenPilot Revo add ons
+//#define REVO_ADD_ONS
+
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be

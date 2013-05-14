@@ -637,6 +637,12 @@ void panRSSI(int first_col, int first_line) {
     osd.openPanel();
     osd.printf("%c%3i%c", 0xE1, rssi, 0x25);
     osd.closePanel();
+#ifdef REVO_ADD_ONS
+    osd.setPanel(first_col-2, first_line-1);
+    osd.openPanel();
+    osd.printf("%4i%c%3i%c", oplm_rssi, 0x8B, oplm_linkquality, 0x8C);
+    osd.closePanel();
+#endif
 }
 
 
