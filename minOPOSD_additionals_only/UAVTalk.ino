@@ -432,6 +432,13 @@ int uavtalk_read(void) {
 				case GPSVELOCITY_OBJID:
 					osd_climb		= -1.0 * uavtalk_get_float(&msg, GPSVELOCITY_OBJ_DOWN);
 				break;
+#ifdef FLIGHT_BATT_ON_REVO
+				case FLIGHTBATTERYSTATE_OBJID:
+        				osd_vbat_A		= uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_VOLTAGE);
+					osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_CURRENT));
+					osd_total_A		= uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_CONSUMED_ENERGY);
+				break;
+#endif
 #ifdef REVO_ADD_ONS
 				case OPLINKSTATUS_OBJID:
         				oplm_rssi		= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_RSSI);

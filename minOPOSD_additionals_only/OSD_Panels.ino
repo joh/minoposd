@@ -296,7 +296,7 @@ void panWarn(int first_col, int first_line) {
 		    }
                     break;
                 case 4:						// BATT LOW
-#ifdef FLIGHT_BATT_ON_MINIMOSD
+#if defined FLIGHT_BATT_ON_MINIMOSD || defined FLIGHT_BATT_ON_REVO
                     if (osd_vbat_A < battv/10.0) {
 #else
                     if (osd_vbat_A < float(battv)/10.0 || osd_battery_remaining_A < batt_warn_level) {
@@ -447,7 +447,7 @@ void panBoot(int first_col, int first_line) {
 void panLogo() {
     osd.setPanel(3, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 1.3.0"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 1.4.0"));
 #ifdef PACKETRXOK_ON_MINIMOSD
     osd.printf_P(PSTR(" prxok"));
 #endif
@@ -738,12 +738,12 @@ void panCur_A(int first_col, int first_line) {
 // Panel  : panBatteryPercent
 // Needs  : X, Y locations
 // Output : Battery
-//          (if defined FLIGHT_BATT_ON_MINIMOSD then not percent but consumed mAh)
+//          (if defined FLIGHT_BATT_ON_MINIMOSD || defined FLIGHT_BATT_ON_REVO then not percent but consumed mAh)
 /******************************************************************/
 void panBatteryPercent(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-#ifdef FLIGHT_BATT_ON_MINIMOSD
+#if defined FLIGHT_BATT_ON_MINIMOSD || defined FLIGHT_BATT_ON_REVO
     osd.printf("%c%5i%c", 0xB9, osd_total_A, 0x82);
 #else
     osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
