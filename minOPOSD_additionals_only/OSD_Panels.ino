@@ -545,7 +545,11 @@ void panHomeDir(int first_col, int first_line) {
 void panHomeAlt(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
+#ifdef REVO_ADD_ONS
+    osd.printf("%c%5.0f%c", 0xE7, (double)(revo_baro_alt * convert_length), unit_length);
+#else
     osd.printf("%c%5.0f%c", 0xE7, (double)((osd_alt - osd_home_alt) * convert_length), unit_length);
+#endif
     osd.closePanel();
 }
 

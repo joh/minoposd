@@ -441,6 +441,9 @@ int uavtalk_read(void) {
 				break;
 #endif
 #ifdef REVO_ADD_ONS
+				case BAROALTITUDE_OBJID:
+					revo_baro_alt		= (int16_t) uavtalk_get_float(&msg, BAROALTITUDE_OBJ_ALTITUDE);
+				break;
 				case OPLINKSTATUS_OBJID:
         				oplm_rssi		= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_RSSI);
         				oplm_linkquality	= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_LINKQUALITY);

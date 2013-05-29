@@ -55,6 +55,7 @@ static uint8_t      osd_armed = 0;                  // OP armed info
 static uint8_t      osd_time_hour = 0;              // OP GPS time hour info
 static uint8_t      osd_time_minute = 0;            // OP GPS tiem minute info
 #ifdef REVO_ADD_ONS
+static int16_t      revo_baro_alt = 0;              // Revo baro altitude
 static int8_t       oplm_rssi = 0;                  // OPLM RSSI
 static uint8_t      oplm_linkquality = 0;           // OPLM LinkQuality
 #endif
