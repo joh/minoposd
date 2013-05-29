@@ -767,18 +767,18 @@ void panTime(int first_col, int first_line) {
         engine_start_time = millis();
     }
     start_time = (int) ((millis() - engine_start_time) / 1000);
+#else
+    start_time = (int) (millis() / 1000);
+#endif
     
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%2i%c%02i", 0xB3, ((int)(start_time/60))%60, 0x3A, start_time%60);
-    osd.closePanel();
+#if defined FLIGHT_BATT_ON_REVO
+    osd.printf("%c%2i%c%02i|%c%2i%c%02i", 0xB3, ((int)(start_time/60))%60, 0x3A, start_time%60, 0x65, ((int)(osd_est_flight_time/60))%60, 0x3A, osd_est_flight_time%60);
 #else
-    osd.setPanel(first_col, first_line);
-    osd.openPanel();
-    start_time = (int) (millis() / 1000);
     osd.printf("%c%2i%c%02i", 0xB3, ((int)(start_time/60))%60, 0x3A, start_time%60);
-    osd.closePanel();
 #endif
+    osd.closePanel();
 }
 
 

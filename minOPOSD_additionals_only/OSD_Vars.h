@@ -63,7 +63,10 @@ static uint8_t      oplm_linkquality = 0;           // OPLM LinkQuality
 static int          volt_div_ratio = 0;             // Volt * 100
 static int          curr_amp_per_volt = 0;          // Ampere * 100
 static int          curr_amp_offset = 0;            // Ampere * 10000
+// Flight Batt on MinimOSD and Revo
 static uint16_t     osd_total_A = 0;                // Battery total current [mAh]
+// Flight Batt on Revo
+static uint16_t     osd_est_flight_time = 0;        // Battery estimeted flight time [sec]
 
 
 // Panel BIT registers
