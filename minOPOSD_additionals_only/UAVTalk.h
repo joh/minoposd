@@ -33,12 +33,6 @@
 #include "OSD_Config.h"
 
 
-//#define VERSION_RELEASE_12_10_1		// OpenPilot-RELEASE 12.10.1	Release from 2012.10.26
-#define VERSION_RELEASE_12_10_2			// OpenPilot-RELEASE 12.10.2	Release from 2012.12.21	'Mayan Apocalypse'
-
-
-
-
 // TODO enhancement:
 // Generate the following automatically out of the XML files.
 //
@@ -51,7 +45,7 @@
 // generate release and copy exe to <top>\ground\uavobjgenerator
 // uavobjgenerator -flight ..\..\shared\uavobjectdefinition ..\..\
 
-#if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2
+#if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
 
 #define	FLIGHTTELEMETRYSTATS_OBJID			0x2F7E2902
 #define	GCSTELEMETRYSTATS_OBJID				0xABC72744
@@ -140,8 +134,7 @@ typedef enum {
   FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD=7 
 } FlightStatusFlightModeOptions;
 
-#endif // defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2
-
+#endif // defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
 
 
 

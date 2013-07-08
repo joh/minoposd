@@ -8,32 +8,52 @@
 
 // JRChange: OpenPilot UAVTalk:
 #define PROTOCOL_UAVTALK
+
 // JRChange: Flight Batt on MinimOSD:
 #define FLIGHT_BATT_ON_MINIMOSD
+
 // JRChange: Flight Batt on Revo:
 //#define FLIGHT_BATT_ON_REVO
+
 // JRChange: PacketRxOk on MinimOSD:
 //#define PACKETRXOK_ON_MINIMOSD
+
 // Amedee: Analog RSSI on MinimOSD:
 //#define ANALOG_RSSI_ON_MINIMOSD
+
 // JRChange: artificial horizon original version
 //#define AH_ORIGINAL_VERSION
+
 // JRChange: artificial horizon refactored version
 //#define AH_REFACTORED_VERSION
+
 // JRChange: artificial horizon zero centered
 //#define AH_ZERO_CENTERED
+
 // JRChange: artificial horizon with better resolution
 #define AH_BETTER_RESOLUTION
+
 // JRChange: show_radar
-//#define SHOW_RADAR
+#define SHOW_RADAR
+
 // JRChange: JR specials
 //#define JR_SPECIALS
+
 // JRChange: OP debug
 //#define OP_DEBUG
+
 // JRChange: GPS simulation
 //#define GPS_SIMULATION
+
+// Version
+//#define VERSION_RELEASE_12_10_1		// OpenPilot-RELEASE 12.10.1	Release from 2012.10.26
+//#define VERSION_RELEASE_12_10_2		// OpenPilot-RELEASE 12.10.2	'Mayan Apocalypse'
+//#define VERSION_RELEASE_13_06_1		// OpenPilot-RELEASE 13.06.1	'Italian Stallion' .1
+#define VERSION_RELEASE_13_06_2		// OpenPilot-RELEASE 13.06.2	'Italian Stallion' .2
+
 // OpenPilot additional UAVObjIds for unreleased and released versions
-//#define VERSION_ADDITIONAL_UAVOBJID
+#define VERSION_ADDITIONAL_UAVOBJID
+
 // OpenPilot Revo add ons
 //#define REVO_ADD_ONS
 
