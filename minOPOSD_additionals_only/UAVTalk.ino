@@ -384,9 +384,10 @@ int uavtalk_read(void) {
                                         }
 				break;
 				case FLIGHTSTATUS_OBJID:
-#ifdef VERSION_UNRELEASED_NEXT_ADDITIONAL
+#ifdef VERSION_ADDITIONAL_UAVOBJID
 				case FLIGHTSTATUS_OBJID_001:
 				case FLIGHTSTATUS_OBJID_002:
+				case FLIGHTSTATUS_OBJID_003:
 #endif
         				osd_armed		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_ARMED);
         				osd_mode		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_FLIGHTMODE);
@@ -451,7 +452,7 @@ int uavtalk_read(void) {
 #endif
 #ifdef OP_DEBUG
 				case SYSTEMALARMS_OBJID:
-#ifdef VERSION_UNRELEASED_NEXT_ADDITIONAL
+#ifdef VERSION_ADDITIONAL_UAVOBJID
 				case SYSTEMALARMS_OBJID_001:
 				case SYSTEMALARMS_OBJID_002:
 #endif

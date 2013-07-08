@@ -145,15 +145,16 @@ typedef enum {
 
 
 
-#if defined VERSION_UNRELEASED_NEXT_ADDITIONAL
+#if defined VERSION_ADDITIONAL_UAVOBJID
 
-#define	FLIGHTSTATUS_OBJID_001				0x0ED79A04		// different possible ID for unreleased next version
-#define	FLIGHTSTATUS_OBJID_002				0x1B7AEB74		// different possible ID for unreleased next version
+#define	FLIGHTSTATUS_OBJID_001				0x0ED79A04		// different ID for unreleased next version
+#define	FLIGHTSTATUS_OBJID_002				0x1B7AEB74		// different ID for unreleased next version and 13.06.01
+#define	FLIGHTSTATUS_OBJID_003				0x0B37AA16		// different ID for 13.06.02
 
-#define SYSTEMALARMS_OBJID_001				0x09C7CBFE		// different possible ID for unreleased next version
-#define SYSTEMALARMS_OBJID_002				0x1D70DB44		// different possible ID for unreleased next version
+#define SYSTEMALARMS_OBJID_001				0x09C7CBFE		// different ID for unreleased next version
+#define SYSTEMALARMS_OBJID_002				0x1D70DB44		// different ID for unreleased next version and 13.06.01
 
-#endif // VERSION_UNRELEASED_NEXT_ADDITIONAL
+#endif // VERSION_ADDITIONAL_UAVOBJID
 
 
 

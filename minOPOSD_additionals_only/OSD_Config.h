@@ -32,8 +32,8 @@
 //#define OP_DEBUG
 // JRChange: GPS simulation
 //#define GPS_SIMULATION
-// OpenPilot 'NEXT' additional for unreleased 'NEXT' version
-//#define VERSION_UNRELEASED_NEXT_ADDITIONAL
+// OpenPilot additional UAVObjIds for unreleased and released versions
+//#define VERSION_ADDITIONAL_UAVOBJID
 // OpenPilot Revo add ons
 //#define REVO_ADD_ONS
 
