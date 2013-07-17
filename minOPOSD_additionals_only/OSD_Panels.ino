@@ -57,8 +57,10 @@ static boolean		warning_active = false;
 
 static float		convert_speed = 0;
 static float		convert_length = 0;
+static int16_t		convert_length_large = 0;
 static uint8_t		unit_speed = 0;
 static uint8_t		unit_length = 0;
+static uint8_t		unit_length_large = 0;
 
 static int16_t		chan1_raw_middle = 0;
 static int16_t		chan2_raw_middle = 0;
@@ -120,6 +122,7 @@ void writePanels() {
                 if (ISc(panel,Halt_BIT))	panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]);
                 if (ISc(panel,Alt_BIT))		panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]);
                 if (ISc(panel,Vel_BIT))		panVel(panVel_XY[0][panel], panVel_XY[1][panel]);
+                if (ISe(panel,DIST_BIT))	panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
                 if (ISd(panel,Climb_BIT))	panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
                 if (ISb(panel,Head_BIT))	panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]);
                 if (ISb(panel,Rose_BIT))	panRose(panRose_XY[0][panel], panRose_XY[1][panel]);
@@ -585,6 +588,23 @@ void panVel(int first_col, int first_line) {
 
 
 /******************************************************************/
+// Panel  : panDistance
+// Needs  : X, Y locations
+// Output : travel distance
+/******************************************************************/
+void panDistance(int first_col, int first_line) {
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    if ((osd_travel_distance * convert_length) > 1000.0) {
+        osd.printf("%c%5.2f%c", 0xFE, ((osd_travel_distance * convert_length) / convert_length_large), unit_length_large);
+    } else {
+        osd.printf("%c%5.0f%c", 0xFE, (osd_travel_distance * convert_length), unit_length);
+    }
+    osd.closePanel();
+}
+
+
+/******************************************************************/
 // Panel  : panClimb
 // Needs  : X, Y locations
 // Output : Climb Rate
@@ -764,11 +784,12 @@ void panBatteryPercent(int first_col, int first_line) {
 void panTime(int first_col, int first_line) {
     int start_time;
 
-#ifdef JR_SPECIALS	// Time restarts with 00:00 when measured current > TIME_RESET_AMPERE for the 1st time
+#ifdef JR_SPECIALS	// Time and travel distance reset when measured current > TIME_RESET_AMPERE for the 1st time
     static unsigned long engine_start_time = 0;
     
     if (engine_start_time == 0 && osd_curr_A > TIME_RESET_AMPERE * 100) {
         engine_start_time = millis();
+	osd_travel_distance = 0;
     }
     start_time = (int) ((millis() - engine_start_time) / 1000);
 #else
@@ -1215,12 +1236,16 @@ void set_converts() {
     if (EEPROM.read(measure_ADDR) == 0) {
         convert_speed = 3.6;
         convert_length = 1.0;
+        convert_length_large = 1000;
         unit_speed = 0x81;
         unit_length = 0x8D;
+        unit_length_large = 0xFD;
     } else {
         convert_speed = 2.23;
         convert_length = 3.28;
+        convert_length_large = 5280;
         unit_speed = 0xfb;
         unit_length = 0x66;
+        unit_length_large = 0xFA;
     }
 }

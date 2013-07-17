@@ -37,6 +37,20 @@ void calculateCompassPoint()
 }
 #endif
 
+
+void updateTravelDistance(void)
+{
+  static unsigned long loopTimer = 0;
+
+  if (loopTimer + MEASURE_PERIOD <= millis()) {
+    if (osd_groundspeed > 1.0) {
+      osd_travel_distance += osd_groundspeed * (float) (millis() - loopTimer) / 1000.0;
+    }
+    loopTimer = millis();
+  }
+}
+
+
 //------------------ Battery Remaining Picture ----------------------------------
 
 char setBatteryPic(uint16_t bat_level)

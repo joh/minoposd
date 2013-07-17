@@ -304,6 +304,7 @@ void OnMavlinkTimer()			// duration is up to approx. 10ms depending on choosen d
     calculateCompassPoint();		// calculate the compass point which is shown in panHeading
 #endif
 
+    updateTravelDistance();		// calculate travel distance
     setHeadingPattern();		// generate the heading pattern
     setHomeVars(osd);			// calculate and set Distance from home and Direction to home
     writePanels();			// writing enabled panels (check OSD_Panels Tab)

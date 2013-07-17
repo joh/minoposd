@@ -32,6 +32,7 @@ static float        osd_lon = 0;                    // longitude
 static float        osd_alt = 0;                    // altitude
 static float        osd_climb = 0;                  // climb rate
 static float        osd_groundspeed = 0;            // ground speed
+static float        osd_travel_distance = 0;        // travel distance
 static float        osd_heading = 0;                // ground course heading
 
 static int16_t      osd_roll = 0;                   // roll from FC
@@ -67,7 +68,7 @@ static int          curr_amp_offset = 0;            // Ampere * 10000
 // Flight Batt on MinimOSD and Revo
 static uint16_t     osd_total_A = 0;                // Battery total current [mAh]
 // Flight Batt on Revo
-static uint16_t     osd_est_flight_time = 0;        // Battery estimeted flight time [sec]
+static uint16_t     osd_est_flight_time = 0;        // Battery estimated flight time [sec]
 
 
 // Panel BIT registers
