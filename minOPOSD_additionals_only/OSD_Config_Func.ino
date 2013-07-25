@@ -9,6 +9,7 @@
 #define ISb(panel,whichBit) getBit(panB_REG[panel], whichBit)
 #define ISc(panel,whichBit) getBit(panC_REG[panel], whichBit)
 #define ISd(panel,whichBit) getBit(panD_REG[panel], whichBit)
+#define ISe(panel,whichBit) getBit(panE_REG[panel], whichBit)
 
 
 boolean getBit(byte Reg, byte whichBit) {
@@ -341,12 +342,17 @@ void readPanelSettings() {
     panTune_XY[0][panel] = readEEPROM(panTune_x_ADDR + offset);
     panTune_XY[1][panel] = checkPAL(readEEPROM(panTune_y_ADDR + offset));
 
-//    setBit(panD_REG[panel], Setup_BIT, readEEPROM(panSetup_en_ADDR));
+    //setBit(panD_REG[panel], Setup_BIT, readEEPROM(panSetup_en_ADDR));
     //panSetup_XY[0] = readEEPROM(panSetup_x_ADDR);
     //panSetup_XY[1] = checkPAL(readEEPROM(panSetup_y_ADDR));
+    
     setBit(panD_REG[panel], RSSI_BIT, readEEPROM(panRSSI_en_ADDR + offset));
     panRSSI_XY[0][panel] = readEEPROM(panRSSI_x_ADDR + offset);
     panRSSI_XY[1][panel] = checkPAL(readEEPROM(panRSSI_y_ADDR + offset));
+    
+    setBit(panE_REG[panel], DIST_BIT, readEEPROM(panDistance_en_ADDR + offset));
+    panDistance_XY[0][panel] = readEEPROM(panDistance_x_ADDR + offset);
+    panDistance_XY[1][panel] = checkPAL(readEEPROM(panDistance_y_ADDR + offset));
 }
 
 int checkPAL(int line){

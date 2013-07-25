@@ -43,7 +43,11 @@ TODO:
 
 #define WARN_FLASH_TIME		1000	// [ms]	time with which the warnings are flashing
 #define WARN_RECOVER_TIME	4000	// [ms]	time we stay in the first panel after last warning
+#ifdef JR_SPECIALS
+#define WARN_MAX		6	//	number of implemented warnings
+#else
 #define WARN_MAX		5	//	number of implemented warnings
+#endif
 
 #define MODE_SWITCH_TIME	2000	// [ms]	time for mode switching
 
@@ -122,7 +126,7 @@ void writePanels() {
                 if (ISc(panel,Halt_BIT))	panHomeAlt(panHomeAlt_XY[0][panel], panHomeAlt_XY[1][panel]);
                 if (ISc(panel,Alt_BIT))		panAlt(panAlt_XY[0][panel], panAlt_XY[1][panel]);
                 if (ISc(panel,Vel_BIT))		panVel(panVel_XY[0][panel], panVel_XY[1][panel]);
-                if (ISe(panel,DIST_BIT))	panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
+//                if (ISe(panel,DIST_BIT))	panDistance(panDistance_XY[0][panel], panDistance_XY[1][panel]);
                 if (ISd(panel,Climb_BIT))	panClimb(panClimb_XY[0][panel], panClimb_XY[1][panel]);
                 if (ISb(panel,Head_BIT))	panHeading(panHeading_XY[0][panel], panHeading_XY[1][panel]);
                 if (ISb(panel,Rose_BIT))	panRose(panRose_XY[0][panel], panRose_XY[1][panel]);
@@ -145,6 +149,8 @@ void writePanels() {
                 if (ISc(panel,Hor_BIT))		panUAVPosition(panHorizon_XY[0][panel] + 6, panHorizon_XY[1][panel] + 2);
 	    }
 #endif
+	} else { // off panel
+		panOff();
 	}
     }
 
@@ -257,6 +263,23 @@ void switchPanels() {
 
 
 /******************************************************************/
+// Panel  : panOff
+// Needs  : -
+// Output : -
+/******************************************************************/
+void panOff(void) {
+#ifdef JR_SPECIALS
+// SEARCH GLITCH
+    panGPS(panGPS_XY[0][0], panGPS_XY[1][0]);
+    panRSSI(panRSSI_XY[0][0], panRSSI_XY[1][0]);
+    panGPL(panGPL_XY[0][0], panGPL_XY[1][0]);
+    panFlightMode(panFMod_XY[0][0], panFMod_XY[1][0]);
+    panThr(panThr_XY[0][0], panThr_XY[1][0]);
+#endif
+}
+
+
+/******************************************************************/
 // Panel  : panWarn
 // Needs  : X, Y locations
 // Output : Warnings if there are any
@@ -314,6 +337,14 @@ void panWarn(int first_col, int first_line) {
 			warning_string = "  rssi low  ";
 		    }
                     break;
+#ifdef JR_SPECIALS
+                case 6:						// FAILSAFE
+                    if (osd_chan8_raw > PWM_HI) {
+			warning_type = cycle;
+			warning_string = "  failsafe  ";
+		    }
+                    break;
+#endif
                 }
             } while (!warning_type && cycle != last_warning_type);
 	    if (warning_type) {					// if there a warning
@@ -450,7 +481,7 @@ void panBoot(int first_col, int first_line) {
 void panLogo() {
     osd.setPanel(3, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 1.4.0"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 1.3.2"));
 #ifdef PACKETRXOK_ON_MINIMOSD
     osd.printf_P(PSTR(" prxok"));
 #endif

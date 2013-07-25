@@ -35,8 +35,6 @@
 #define VOLTAGE_PIN			6
 #define CURRENT_PIN			7
 
-#define MEASURE_PERIOD			95			// ms
-
 #define REF_VOLTAGE			1.1			// INTERNAL: a built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
 #define LOW_VOLTAGE			9.6			// filter start value for 3s LiPo
 

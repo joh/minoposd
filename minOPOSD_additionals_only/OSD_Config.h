@@ -57,6 +57,8 @@
 // OpenPilot Revo add ons
 //#define REVO_ADD_ONS
 
+#define MEASURE_PERIOD			95	// ms
+
 
 // EEPROM Stepping, be careful not to overstep. 
 // We reserved floats for just to be sure if some values needs to be

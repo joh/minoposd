@@ -457,7 +457,8 @@ int uavtalk_read(void) {
 				case SYSTEMALARMS_OBJID_002:
 #endif
 					op_alarm  = msg.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
-					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
+//					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
+					op_alarm += msg.Data[SYSTEMALARMS_ALARM_MANUALCONTROL] * 0x10;
 					if (op_alarm > 0x11) show_prio_info = 1;
 				break;
 #endif

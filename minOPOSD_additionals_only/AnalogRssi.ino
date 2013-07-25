@@ -43,7 +43,12 @@ void analog_rssi_read(void)
 		osd_rssi = analogRead(RSSI_PIN) / 4;				// Just raw value, 0-255. We use this range to better align
 										// with the original code.
 	} else {
+#ifdef JR_SPECIALS
+// SEARCH GLITCH
+		osd_rssi = analogRead(RSSI_PIN)       / 4;			// 1:1 input
+#else
 		osd_rssi = analogRead(RSSI_PIN) * .2  / 4 + osd_rssi * .8;	// Smooth input
+#endif
 		osd_rssi = constrain(osd_rssi, rssipersent, rssical);		// Ensure we stay in range
 	}
 }

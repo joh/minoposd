@@ -76,6 +76,7 @@ byte panA_REG[npanels] = {0b00000000};
 byte panB_REG[npanels] = {0b00000000};
 byte panC_REG[npanels] = {0b00000000};
 byte panD_REG[npanels] = {0b00000000};
+byte panE_REG[npanels] = {0b00000000};
 
 
 // First 8 panels and their X,Y coordinate holders
@@ -120,6 +121,7 @@ byte panClimb_XY[2][npanels];
 byte panTune_XY[2][npanels];
 //byte panSetup_XY[2];
 byte panRSSI_XY[2][npanels];
+byte panDistance_XY[2][npanels];
 
 
 //*************************************************************************************************************
