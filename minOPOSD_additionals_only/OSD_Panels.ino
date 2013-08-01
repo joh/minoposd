@@ -755,9 +755,15 @@ void panFlightMode(int first_col, int first_line) {
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2    ) mode_str = "st2";	// STABILIZED2
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3    ) mode_str = "st3";	// STABILIZED3
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE       ) mode_str = "at ";	// AUTOTUNE
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD   ) mode_str = "ah ";	// ALTITUDEHOLD
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD   ) mode_str = "alh";	// ALTITUDEHOLD
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO  ) mode_str = "alv";	// ALTITUDEVARIO
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL) mode_str = "vc ";	// VELOCITYCONTROL
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD   ) mode_str = "ph ";	// POSITIONHOLD
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE   ) mode_str = "rtb";	// RETURNTOBASE
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_LAND           ) mode_str = "lan";	// LAND
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER    ) mode_str = "pp ";	// PATHPLANNER
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POI            ) mode_str = "poi";	// POI
+    
     osd.printf("%c%s", 0xE0, mode_str);
     osd.closePanel();
 }
