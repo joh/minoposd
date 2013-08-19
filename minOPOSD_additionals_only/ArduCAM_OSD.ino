@@ -100,7 +100,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #define MinimOSD
 
 #define TELEMETRY_SPEED  57600  // How fast our MAVLink telemetry is coming to Serial port
+
+#ifdef USE_WITH_MINRXOSD
+#define BOOTTIME         8000   // Time in milliseconds that we show boot loading bar and wait user input
+#else
 #define BOOTTIME         2000   // Time in milliseconds that we show boot loading bar and wait user input
+#endif
 
 // Objects and Serial definitions
 FastSerialPort0(Serial);
@@ -186,6 +191,10 @@ void setup()
 
 #ifdef ANALOG_RSSI_ON_MINIMOSD
     analog_rssi_init();
+#endif
+
+#ifdef USE_WITH_MINRXOSD
+    delay(1000);
 #endif
 
     // Startup MAVLink timers  

@@ -9,8 +9,13 @@
 // This is interesting to avoid writing to APM during bootup if OSD's TX is connected
 // After that, it continue in normal mode eg starting to listen MAVLink commands
 
+#ifdef USE_WITH_MINRXOSD
+#define barX 5
+#define barY 13
+#else
 #define barX 5
 #define barY 12
+#endif
 
 void loadBar() { //change name due we don't have CLI anymore
   int waitTimer;
@@ -33,35 +38,32 @@ void loadBar() { //change name due we don't have CLI anymore
       osd.setPanel(barX + 12, barY);
       osd.openPanel();
       switch(barStep) {
-        case 0:
+        case 1:
          osd.printf_P(PSTR("\xf1\xf2\xf2\xf2\xf2\xf2\xf2"));
          break;
-        case 1:
+        case 2:
          osd.printf_P(PSTR("\xef\xf2\xf2\xf2\xf2\xf2\xf2"));
          break;
-        case 2:
+        case 3:
          osd.printf_P(PSTR("\xee\xf0\xf2\xf2\xf2\xf2\xf2"));
          break;
-        case 3:
+        case 4:
          osd.printf_P(PSTR("\xee\xee\xf0\xf2\xf2\xf2\xf2"));
          break;
-        case 4:
+        case 5:
          osd.printf_P(PSTR("\xee\xee\xee\xf0\xf2\xf2\xf2"));
          break;
-        case 5:
+        case 6:
          osd.printf_P(PSTR("\xee\xee\xee\xee\xf0\xf2\xf2"));
          break;
-        case 6:
+        case 7:
          osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xf0\xf2"));
          break;
-        case 7:
+        case 8:
          osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xee\xf0"));
          break;
-        case 8:
-         osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xee\xee"));
-         break;
         case 9:
-         osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xee\xee\xee"));
+         osd.printf_P(PSTR("\xee\xee\xee\xee\xee\xee\xee"));
          break;
       }
       osd.closePanel();

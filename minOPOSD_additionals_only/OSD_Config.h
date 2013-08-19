@@ -6,6 +6,9 @@
 // Only devs should increment this
 #define VER 75
 
+// JRChange: use with minRXOSD:
+//#define USE_WITH_MINRXOSD
+
 // JRChange: OpenPilot UAVTalk:
 #define PROTOCOL_UAVTALK
 

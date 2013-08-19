@@ -479,9 +479,15 @@ void panBoot(int first_col, int first_line) {
 // Output : Startup OSD LOGO
 /******************************************************************/
 void panLogo() {
+#ifdef USE_WITH_MINRXOSD
+    osd.setPanel(5, 12);
+    osd.openPanel();
+    osd.printf_P(PSTR("minoposd 1.3.2"));
+#else
     osd.setPanel(3, 5);
     osd.openPanel();
     osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 1.3.2"));
+#endif
 #ifdef PACKETRXOK_ON_MINIMOSD
     osd.printf_P(PSTR(" prxok"));
 #endif
@@ -537,7 +543,7 @@ void panGPS(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 #ifdef JR_SPECIALS	// I like it more one row style
-    osd.printf("%c%10.6f     %c%10.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
+    osd.printf("%c%10.6f     %c%10.6f", 0x83, (double)(osd_lat), 0x84, (double)(osd_lon));
 #else
     osd.printf("%c%11.6f|%c%11.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
 #endif
