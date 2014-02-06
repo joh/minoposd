@@ -37,6 +37,10 @@
 static unsigned long last_gcstelemetrystats_send = 0;
 static unsigned long last_flighttelemetry_connect = 0;
 static uint8_t gcstelemetrystatus = TELEMETRYSTATS_STATE_DISCONNECTED;
+static uint32_t gcstelemetrystats_objid = 0;
+static uint8_t gcstelemetrystats_obj_len = 0;
+static uint8_t gcstelemetrystats_obj_status = 0;
+static uint8_t flighttelemetrystats_obj_status = 0;
 
 
 // CRC lookup table
@@ -214,22 +218,45 @@ void uavtalk_send_gcstelemetrystats(void) {
 	uint8_t *d;
 	uint8_t i;
 	uavtalk_message_t msg;
-	
+
+	if (gcstelemetrystats_obj_len == 0) return;	// we didn't know yet with which version we are talking, so be quiet
+
 	msg.Sync	= UAVTALK_SYNC_VAL;
 	msg.MsgType	= UAVTALK_TYPE_OBJ_ACK;
-	msg.Length	= GCSTELEMETRYSTATS_OBJ_LEN;
-	msg.ObjID	= GCSTELEMETRYSTATS_OBJID;
+	msg.Length	= gcstelemetrystats_obj_len + 8;
+	msg.ObjID	= gcstelemetrystats_objid;
 
 	d = msg.Data;
-	for (i=0; i<msg.Length-8; i++) {
+	for (i=0; i<gcstelemetrystats_obj_len; i++) {
 		*d++ = 0;
 	}
 
-	msg.Data[GCSTELEMETRYSTATS_OBJ_STATUS] = gcstelemetrystatus;
+	msg.Data[gcstelemetrystats_obj_status] = gcstelemetrystatus;
 	// remaining data unused and unset
 	
 	uavtalk_send_msg(&msg);
 	last_gcstelemetrystats_send = millis();
+}
+
+
+void set_telemetrystats_values(uint32_t ObjID) {
+
+	if (gcstelemetrystats_obj_len != 0) return;	// we already know yet with which version we are talking, so do nothing
+
+	switch (ObjID) {
+		case FLIGHTTELEMETRYSTATS_OBJID:
+			gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID;
+			gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN;
+			gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS;
+			flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS;
+		break;
+		case FLIGHTTELEMETRYSTATS_OBJID_001:
+			gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID_001;
+			gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN_001;
+			gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS_001;
+			flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS_001;
+		break;
+	}
 }
 
 
@@ -357,7 +384,11 @@ int uavtalk_read(void) {
 			// consume msg
 			switch (msg.ObjID) {
 				case FLIGHTTELEMETRYSTATS_OBJID:
-					switch (msg.Data[FLIGHTTELEMETRYSTATS_OBJ_STATUS]) {
+#ifdef VERSION_ADDITIONAL_UAVOBJID
+				case FLIGHTTELEMETRYSTATS_OBJID_001:
+#endif
+					set_telemetrystats_values(msg.ObjID);
+					switch (msg.Data[flighttelemetrystats_obj_status]) {
 						case TELEMETRYSTATS_STATE_DISCONNECTED:
 							gcstelemetrystatus = TELEMETRYSTATS_STATE_HANDSHAKEREQ;
 							uavtalk_send_gcstelemetrystats();
@@ -373,6 +404,7 @@ int uavtalk_read(void) {
 					}
 				break;
 				case ATTITUDEACTUAL_OBJID:
+				case ATTITUDESTATE_OBJID:
 					last_flighttelemetry_connect = millis();
 					show_prio_info = 1;
         				osd_roll		= (int16_t) uavtalk_get_float(&msg, ATTITUDEACTUAL_OBJ_ROLL);
@@ -393,6 +425,9 @@ int uavtalk_read(void) {
         				osd_mode		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_FLIGHTMODE);
 				break;
 				case MANUALCONTROLCOMMAND_OBJID:
+#ifdef VERSION_ADDITIONAL_UAVOBJID
+				case MANUALCONTROLCOMMAND_OBJID_001:
+#endif
 					osd_throttle		= (int16_t) (100.0 * uavtalk_get_float(&msg, MANUALCONTROLCOMMAND_OBJ_THROTTLE));
 					if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
 					// Channel mapping:
@@ -414,6 +449,7 @@ int uavtalk_read(void) {
 				break;
 #ifndef GPS_SIMULATION
 				case GPSPOSITION_OBJID:
+				case GPSPOSITIONSENSOR_OBJID:
 					osd_lat			= uavtalk_get_int32(&msg, GPSPOSITION_OBJ_LAT) / 10000000.0;
 					osd_lon			= uavtalk_get_int32(&msg, GPSPOSITION_OBJ_LON) / 10000000.0;
 					osd_satellites_visible	= uavtalk_get_int8(&msg, GPSPOSITION_OBJ_SATELLITES);
@@ -431,6 +467,7 @@ int uavtalk_read(void) {
 				break;
 #endif
 				case GPSVELOCITY_OBJID:
+				case GPSVELOCITYSENSOR_OBJID:
 					osd_climb		= -1.0 * uavtalk_get_float(&msg, GPSVELOCITY_OBJ_DOWN);
 				break;
 #ifdef FLIGHT_BATT_ON_REVO
@@ -443,9 +480,13 @@ int uavtalk_read(void) {
 #endif
 #ifdef REVO_ADD_ONS
 				case BAROALTITUDE_OBJID:
+				case BAROSENSOR_OBJID:
 					revo_baro_alt		= (int16_t) uavtalk_get_float(&msg, BAROALTITUDE_OBJ_ALTITUDE);
 				break;
 				case OPLINKSTATUS_OBJID:
+#ifdef VERSION_ADDITIONAL_UAVOBJID
+				case OPLINKSTATUS_OBJID_001:
+#endif
         				oplm_rssi		= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_RSSI);
         				oplm_linkquality	= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_LINKQUALITY);
 				break;
@@ -455,6 +496,7 @@ int uavtalk_read(void) {
 #ifdef VERSION_ADDITIONAL_UAVOBJID
 				case SYSTEMALARMS_OBJID_001:
 				case SYSTEMALARMS_OBJID_002:
+				case SYSTEMALARMS_OBJID_003:
 #endif
 					op_alarm  = msg.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
 //					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
