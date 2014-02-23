@@ -52,8 +52,8 @@
 //#define VERSION_RELEASE_12_10_1		// OpenPilot-RELEASE 12.10.1	Release from 2012.10.26
 //#define VERSION_RELEASE_12_10_2		// OpenPilot-RELEASE 12.10.2	'Mayan Apocalypse'
 //#define VERSION_RELEASE_13_06_1		// OpenPilot-RELEASE 13.06.1	'Italian Stallion' .1
-#define VERSION_RELEASE_13_06_2			// OpenPilot-RELEASE 13.06.2	'Italian Stallion' .2
-//#define VERSION_RELEASE_14_02_1		// OpenPilot-RELEASE 14.02.1
+//#define VERSION_RELEASE_13_06_2		// OpenPilot-RELEASE 13.06.2	'Italian Stallion' .2
+#define VERSION_RELEASE_14_01_1			// OpenPilot-RELEASE 14.01.1	'Cruising Ratt' .1
 
 // OpenPilot additional UAVObjIds for unreleased and released versions
 #define VERSION_ADDITIONAL_UAVOBJID
