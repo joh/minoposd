@@ -223,8 +223,14 @@ typedef enum {
 #define	FLIGHTTELEMETRYSTATS_CONNECT_TIMEOUT		10000
 #define	GCSTELEMETRYSTATS_SEND_PERIOD			1000
 
-#define	RESPOND_OBJ_LEN					8
-#define	REQUEST_OBJ_LEN					8
+#if defined VERSION_RELEASE_14_01_1
+#define HEADER_LEN                                      10
+#else
+#define HEADER_LEN                                      8
+#endif
+
+#define	RESPOND_OBJ_LEN					HEADER_LEN
+#define	REQUEST_OBJ_LEN					HEADER_LEN
 
 #define UAVTALK_SYNC_VAL				0x3C
 

@@ -37,10 +37,18 @@
 static unsigned long last_gcstelemetrystats_send = 0;
 static unsigned long last_flighttelemetry_connect = 0;
 static uint8_t gcstelemetrystatus = TELEMETRYSTATS_STATE_DISCONNECTED;
-static uint32_t gcstelemetrystats_objid = 0;
-static uint8_t gcstelemetrystats_obj_len = 0;
-static uint8_t gcstelemetrystats_obj_status = 0;
-static uint8_t flighttelemetrystats_obj_status = 0;
+
+#if defined VERSION_RELEASE_14_01_1
+static uint32_t gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID_001;
+static uint8_t gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN_001;
+static uint8_t gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS_001;
+static uint8_t flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS_001;
+#else
+static uint32_t gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID;
+static uint8_t gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN;
+static uint8_t gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS;
+static uint8_t flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS;
+#endif
 
 
 // CRC lookup table
@@ -74,7 +82,7 @@ void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
 	osd.setPanel(1, y);
 	osd.openPanel();
 	
-	osd.printf("%6u Header ", millis());
+	osd.printf("%6u header ", millis());
 	c = (uint8_t) (msg->Sync);
 	osd.printf("%2x ", c);
 	crc = crc_table[0 ^ c];
@@ -99,18 +107,27 @@ void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
 	c = (uint8_t) ((msg->ObjID >> 24) & 0xff);
 	osd.printf("%2x ", c);
 	crc = crc_table[crc ^ c];
+
+#if defined VERSION_RELEASE_14_01_1
+	c = (uint8_t) (msg->InstID & 0xff);
+	osd.printf("%2x ", c);
+	crc = crc_table[crc ^ c];
+	c = (uint8_t) ((msg->InstID >> 8) & 0xff);
+	osd.printf("%2x ", c);
+	crc = crc_table[crc ^ c];
+#endif
 	
-	osd.printf("Data ");
-	if (msg->Length > 8) {
+	osd.printf("data ");
+	if (msg->Length > HEADER_LEN) {
 	  d = msg->Data;
-	  for (i=0; i<msg->Length-8; i++) {
+	  for (i=0; i<msg->Length-HEADER_LEN; i++) {
 		c = *d++;
 	        osd.printf("%2x ", c);
 		crc = crc_table[crc ^ c];
           }
 	}
 	
-	osd.printf("CRC ");
+	osd.printf("crc ");
 	osd.printf("%2x(%2x)", msg->Crc, crc);
 
 	osd.closePanel();
@@ -176,9 +193,19 @@ void uavtalk_send_msg(uavtalk_message_t *msg) {
 	c = (uint8_t) ((msg->ObjID >> 24) & 0xff);
 	Serial.write(c);
 	msg->Crc = crc_table[msg->Crc ^ c];
-	if (msg->Length > 8) {
+
+#if defined VERSION_RELEASE_14_01_1
+	c = 0; //(uint8_t) (msg->InstID & 0xff);
+	Serial.write(c);
+	msg->Crc = crc_table[msg->Crc ^ c];
+	c = 0; //(uint8_t) ((msg->InstID >> 8) & 0xff);
+	Serial.write(c);
+	msg->Crc = crc_table[msg->Crc ^ c];
+#endif
+        
+	if (msg->Length > HEADER_LEN) {
 	  d = msg->Data;
-	  for (i=0; i<msg->Length-8; i++) {
+	  for (i=0; i<msg->Length-HEADER_LEN; i++) {
 		c = *d++;
 		Serial.write(c);
 		msg->Crc = crc_table[msg->Crc ^ c];
@@ -219,11 +246,9 @@ void uavtalk_send_gcstelemetrystats(void) {
 	uint8_t i;
 	uavtalk_message_t msg;
 
-	if (gcstelemetrystats_obj_len == 0) return;	// we didn't know yet with which version we are talking, so be quiet
-
 	msg.Sync	= UAVTALK_SYNC_VAL;
 	msg.MsgType	= UAVTALK_TYPE_OBJ_ACK;
-	msg.Length	= gcstelemetrystats_obj_len + 8;
+	msg.Length	= gcstelemetrystats_obj_len + HEADER_LEN;
 	msg.ObjID	= gcstelemetrystats_objid;
 
 	d = msg.Data;
@@ -236,27 +261,6 @@ void uavtalk_send_gcstelemetrystats(void) {
 	
 	uavtalk_send_msg(&msg);
 	last_gcstelemetrystats_send = millis();
-}
-
-
-void set_telemetrystats_values(uint32_t ObjID) {
-
-	if (gcstelemetrystats_obj_len != 0) return;	// we already know yet with which version we are talking, so do nothing
-
-	switch (ObjID) {
-		case FLIGHTTELEMETRYSTATS_OBJID:
-			gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID;
-			gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN;
-			gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS;
-			flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS;
-		break;
-		case FLIGHTTELEMETRYSTATS_OBJID_001:
-			gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID_001;
-			gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN_001;
-			gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS_001;
-			flighttelemetrystats_obj_status = FLIGHTTELEMETRYSTATS_OBJ_STATUS_001;
-		break;
-	}
 }
 
 
@@ -292,10 +296,10 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 			}
 			else {
 				msg->Length += ((uint16_t) c) << 8;
-                                if ((msg->Length < 8) || (msg->Length > 255 + 8)) {
+                                if ((msg->Length < HEADER_LEN) || (msg->Length > 255 + HEADER_LEN)) {
                                        // Drop corrupted messages:
-                                       // Minimal length is 8 (headers)
-                                       // Maximum is 8 (headers) + 255 (Data) + 2 (Optional Instance Id)
+                                       // Minimal length is HEADER_LEN
+                                       // Maximum is HEADER_LEN + 255 (Data) + 2 (Optional Instance Id)
                                        // As we are not parsing Instance Id, 255 is a hard maximum. 
 				       status = UAVTALK_PARSE_STATE_WAIT_SYNC;
                                 } else {
@@ -319,22 +323,42 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 				break;
 				case 4:
 					msg->ObjID += ((uint32_t) c) << 24;
-					if (msg->Length == 8) { // no data exists
+#if defined VERSION_RELEASE_14_01_1
+					status = UAVTALK_PARSE_STATE_GOT_OBJID;
+#else
+					if (msg->Length == HEADER_LEN) { // no data exists
 						status = UAVTALK_PARSE_STATE_GOT_DATA;
 					} else {
-						status = UAVTALK_PARSE_STATE_GOT_OBJID;
+						status = UAVTALK_PARSE_STATE_GOT_INSTID;
+                                        }
+#endif
+					cnt = 0;
+				break;
+			}
+		break;
+		case UAVTALK_PARSE_STATE_GOT_OBJID:
+			crc = crc_table[crc ^ c];
+			cnt++;
+			switch (cnt) {
+				case 1:
+					msg->InstID = ((uint32_t) c);
+				break;
+				case 2:
+					msg->InstID += ((uint32_t) c) << 8;
+					if (msg->Length == HEADER_LEN) { // no data exists
+						status = UAVTALK_PARSE_STATE_GOT_DATA;
+					} else {
+						status = UAVTALK_PARSE_STATE_GOT_INSTID;
 					}
 					cnt = 0;
 				break;
 			}
 		break;
-		// TODO enhancement: we don't need/use INSTID and so we currently don't parse it
-		case UAVTALK_PARSE_STATE_GOT_OBJID:
 		case UAVTALK_PARSE_STATE_GOT_INSTID:
 			crc = crc_table[crc ^ c];
 			cnt++;
 			msg->Data[cnt - 1] = c;
-			if (cnt >= msg->Length - 8) {
+			if (cnt >= msg->Length - HEADER_LEN) {
 				status = UAVTALK_PARSE_STATE_GOT_DATA;
 				cnt = 0;
 			}
@@ -387,7 +411,6 @@ int uavtalk_read(void) {
 #ifdef VERSION_ADDITIONAL_UAVOBJID
 				case FLIGHTTELEMETRYSTATS_OBJID_001:
 #endif
-					set_telemetrystats_values(msg.ObjID);
 					switch (msg.Data[flighttelemetrystats_obj_status]) {
 						case TELEMETRYSTATS_STATE_DISCONNECTED:
 							gcstelemetrystatus = TELEMETRYSTATS_STATE_HANDSHAKEREQ;
