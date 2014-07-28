@@ -443,6 +443,7 @@ int uavtalk_read(void) {
 				case FLIGHTSTATUS_OBJID_001:
 				case FLIGHTSTATUS_OBJID_002:
 				case FLIGHTSTATUS_OBJID_003:
+				case FLIGHTSTATUS_OBJID_004:
 #endif
         				osd_armed		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_ARMED);
         				osd_mode		= uavtalk_get_int8(&msg, FLIGHTSTATUS_OBJ_FLIGHTMODE);
@@ -450,6 +451,7 @@ int uavtalk_read(void) {
 				case MANUALCONTROLCOMMAND_OBJID:
 #ifdef VERSION_ADDITIONAL_UAVOBJID
 				case MANUALCONTROLCOMMAND_OBJID_001:
+				case MANUALCONTROLCOMMAND_OBJID_002:
 #endif
 					osd_throttle		= (int16_t) (100.0 * uavtalk_get_float(&msg, MANUALCONTROLCOMMAND_OBJ_THROTTLE));
 					if (osd_throttle < 0 || osd_throttle > 200) osd_throttle = 0;
@@ -495,6 +497,7 @@ int uavtalk_read(void) {
 				break;
 #ifdef FLIGHT_BATT_ON_REVO
 				case FLIGHTBATTERYSTATE_OBJID:
+				case FLIGHTBATTERYSTATE_OBJID_001:
         				osd_vbat_A		= uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_VOLTAGE);
 					osd_curr_A		= (int16_t) (100.0 * uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_CURRENT));
 					osd_total_A		= (int16_t) uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_CONSUMED_ENERGY);
@@ -520,6 +523,7 @@ int uavtalk_read(void) {
 				case SYSTEMALARMS_OBJID_001:
 				case SYSTEMALARMS_OBJID_002:
 				case SYSTEMALARMS_OBJID_003:
+				case SYSTEMALARMS_OBJID_004:
 #endif
 					op_alarm  = msg.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
 //					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
