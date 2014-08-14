@@ -783,7 +783,7 @@ void panFlightMode(int first_col, int first_line) {
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV ) mode_str = "pvf";	// POSITIONVARIOFPV
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS ) mode_str = "pvl";	// POSITIONVARIOLOS
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW) mode_str = "pvd";	// POSITIONVARIONSEW
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE     ) mode_str = "trb";	// RETURNTOBASE
+    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE     ) mode_str = "rtb";	// RETURNTOBASE
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_LAND             ) mode_str = "lan";	// LAND
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER      ) mode_str = "pp ";	// PATHPLANNER
     else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POI              ) mode_str = "poi";	// POI

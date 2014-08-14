@@ -246,7 +246,7 @@ typedef enum {
 #define	FLIGHTTELEMETRYSTATS_CONNECT_TIMEOUT		10000
 #define	GCSTELEMETRYSTATS_SEND_PERIOD			1000
 
-#if defined VERSION_RELEASE_14_01_1
+#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1
 #define HEADER_LEN                                      10
 #else
 #define HEADER_LEN                                      8
