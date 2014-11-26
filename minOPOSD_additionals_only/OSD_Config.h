@@ -54,7 +54,8 @@
 //#define VERSION_RELEASE_13_06_1		// OpenPilot-RELEASE 13.06.1	'Italian Stallion' .1
 //#define VERSION_RELEASE_13_06_2		// OpenPilot-RELEASE 13.06.2	'Italian Stallion' .2
 //#define VERSION_RELEASE_14_01_1		// OpenPilot-RELEASE 14.01.1	'Cruising Ratt' .1
-#define VERSION_RELEASE_14_06_1			// OpenPilot-RELEASE 14.06.1	'Peanuts Schnapps' .1
+//#define VERSION_RELEASE_14_06_1		// OpenPilot-RELEASE 14.06.1	'Peanuts Schnapps' .1
+#define VERSION_RELEASE_14_10_1			// OpenPilot-RELEASE 14.10.1	'unknown yet' .1
 
 // OpenPilot additional UAVObjIds for unreleased and released versions
 #define VERSION_ADDITIONAL_UAVOBJID
