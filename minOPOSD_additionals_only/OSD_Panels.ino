@@ -176,7 +176,7 @@ void switchPanels() {
     static uint16_t		ch_raw = 0;
 
     if (ch_toggle == 4) {
-        if ((osd_mode != FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE) && (osd_mode != FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD)) {
+        if (osd_mode < 4) {
             if (osd_off_switch != osd_mode) { 
                 osd_off_switch = osd_mode;
                 osd_switch_time = millis();
@@ -482,11 +482,11 @@ void panLogo() {
 #ifdef USE_WITH_MINRXOSD
     osd.setPanel(5, 12);
     osd.openPanel();
-    osd.printf_P(PSTR("minoposd 14.10"));
+    osd.printf_P(PSTR("minoposd 15.01"));
 #else
     osd.setPanel(3, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 14.10"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 15.01"));
 #endif
 #ifdef PACKETRXOK_ON_MINIMOSD
     osd.printf_P(PSTR(" prxok"));
@@ -757,39 +757,58 @@ void panFlightMode(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 #if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2 || defined VERSION_RELEASE_14_01_1
-    if      (osd_mode == FLIGHTSTATUS_FLIGHTMODE_MANUAL         ) mode_str = "man";	// MANUAL
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1    ) mode_str = "st1";	// STABILIZED1
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2    ) mode_str = "st2";	// STABILIZED2
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3    ) mode_str = "st3";	// STABILIZED3
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE       ) mode_str = "at ";	// AUTOTUNE
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD   ) mode_str = "alh";	// ALTITUDEHOLD
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO  ) mode_str = "alv";	// ALTITUDEVARIO
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL) mode_str = "vc ";	// VELOCITYCONTROL
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD   ) mode_str = "ph ";	// POSITIONHOLD
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE   ) mode_str = "rtb";	// RETURNTOBASE
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_LAND           ) mode_str = "lan";	// LAND
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER    ) mode_str = "pp ";	// PATHPLANNER
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POI            ) mode_str = "poi";	// POI
-#else
-    if      (osd_mode == FLIGHTSTATUS_FLIGHTMODE_MANUAL           ) mode_str = "man";	// MANUAL
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1      ) mode_str = "st1";	// STABILIZED1
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2      ) mode_str = "st2";	// STABILIZED2
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3      ) mode_str = "st3";	// STABILIZED3
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED4      ) mode_str = "st4";	// STABILIZED4
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED5      ) mode_str = "st5";	// STABILIZED5
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_STABILIZED6      ) mode_str = "st6";	// STABILIZED6
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE         ) mode_str = "at ";	// AUTOTUNE
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD     ) mode_str = "ph ";	// POSITIONHOLD
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV ) mode_str = "pvf";	// POSITIONVARIOFPV
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS ) mode_str = "pvl";	// POSITIONVARIOLOS
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW) mode_str = "pvd";	// POSITIONVARIONSEW
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE     ) mode_str = "rtb";	// RETURNTOBASE
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_LAND             ) mode_str = "lan";	// LAND
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER      ) mode_str = "pp ";	// PATHPLANNER
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_POI              ) mode_str = "poi";	// POI
-    else if (osd_mode == FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE       ) mode_str = "ac ";	// AUTOCRUISE
+    if      (osd_mode ==  0 ) mode_str = "man";	// MANUAL
+    else if (osd_mode ==  1 ) mode_str = "st1";	// STABILIZED1
+    else if (osd_mode ==  2 ) mode_str = "st2";	// STABILIZED2
+    else if (osd_mode ==  3 ) mode_str = "st3";	// STABILIZED3
+    else if (osd_mode ==  4 ) mode_str = "at ";	// AUTOTUNE
+    else if (osd_mode ==  5 ) mode_str = "alh";	// ALTITUDEHOLD
+    else if (osd_mode ==  6 ) mode_str = "alv";	// ALTITUDEVARIO
+    else if (osd_mode ==  7 ) mode_str = "vc ";	// VELOCITYCONTROL
+    else if (osd_mode ==  8 ) mode_str = "ph ";	// POSITIONHOLD
+    else if (osd_mode ==  9 ) mode_str = "rtb";	// RETURNTOBASE
+    else if (osd_mode == 10 ) mode_str = "lan";	// LAND
+    else if (osd_mode == 11 ) mode_str = "pp ";	// PATHPLANNER
+    else if (osd_mode == 12 ) mode_str = "poi";	// POI
 #endif
-    
+#if defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1
+    if      (osd_mode ==  0) mode_str = "man";	// MANUAL
+    else if (osd_mode ==  1) mode_str = "st1";	// STABILIZED1
+    else if (osd_mode ==  2) mode_str = "st2";	// STABILIZED2
+    else if (osd_mode ==  3) mode_str = "st3";	// STABILIZED3
+    else if (osd_mode ==  4) mode_str = "st4";	// STABILIZED4
+    else if (osd_mode ==  5) mode_str = "st5";	// STABILIZED5
+    else if (osd_mode ==  6) mode_str = "st6";	// STABILIZED6
+    else if (osd_mode ==  7) mode_str = "at ";	// AUTOTUNE
+    else if (osd_mode ==  8) mode_str = "ph ";	// POSITIONHOLD
+    else if (osd_mode ==  9) mode_str = "pvf";	// POSITIONVARIOFPV
+    else if (osd_mode == 10) mode_str = "pvl";	// POSITIONVARIOLOS
+    else if (osd_mode == 11) mode_str = "pvd";	// POSITIONVARIONSEW
+    else if (osd_mode == 12) mode_str = "rtb";	// RETURNTOBASE
+    else if (osd_mode == 13) mode_str = "lan";	// LAND
+    else if (osd_mode == 14) mode_str = "pp ";	// PATHPLANNER
+    else if (osd_mode == 15) mode_str = "poi";	// POI
+    else if (osd_mode == 16) mode_str = "ac ";	// AUTOCRUISE
+#endif
+#if defined VERSION_RELEASE_15_01_1
+    if      (osd_mode ==  0) mode_str = "man";	// MANUAL
+    else if (osd_mode ==  1) mode_str = "st1";	// STABILIZED1
+    else if (osd_mode ==  2) mode_str = "st2";	// STABILIZED2
+    else if (osd_mode ==  3) mode_str = "st3";	// STABILIZED3
+    else if (osd_mode ==  4) mode_str = "st4";	// STABILIZED4
+    else if (osd_mode ==  5) mode_str = "st5";	// STABILIZED5
+    else if (osd_mode ==  6) mode_str = "st6";	// STABILIZED6
+    else if (osd_mode ==  7) mode_str = "ph ";	// POSITIONHOLD
+    else if (osd_mode ==  8) mode_str = "cl ";	// COURSELOCK
+    else if (osd_mode ==  9) mode_str = "pr ";	// POSITIONROAM
+    else if (osd_mode == 10) mode_str = "hl ";	// HOMELEASH
+    else if (osd_mode == 11) mode_str = "pa ";	// ABSOLUTEPOSITION
+    else if (osd_mode == 12) mode_str = "rtb";	// RETURNTOBASE
+    else if (osd_mode == 13) mode_str = "lan";	// LAND
+    else if (osd_mode == 14) mode_str = "pp ";	// PATHPLANNER
+    else if (osd_mode == 15) mode_str = "poi";	// POI
+    else if (osd_mode == 16) mode_str = "ac ";	// AUTOCRUISE
+#endif    
     osd.printf("%c%s", 0xE0, mode_str);
     osd.closePanel();
 }
