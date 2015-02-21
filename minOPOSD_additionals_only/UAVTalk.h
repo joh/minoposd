@@ -228,10 +228,10 @@
 #define	FLIGHTTELEMETRYSTATS_CONNECT_TIMEOUT		10000
 #define	GCSTELEMETRYSTATS_SEND_PERIOD			1000
 
-#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
-#define HEADER_LEN                                      10
-#else
+#if defined VERSION_RELEASE_12_10_1 || defined VERSION_RELEASE_12_10_2 || defined VERSION_RELEASE_13_06_1 || defined VERSION_RELEASE_13_06_2
 #define HEADER_LEN                                      8
+#else
+#define HEADER_LEN                                      10
 #endif
 
 #define	RESPOND_OBJ_LEN					HEADER_LEN
