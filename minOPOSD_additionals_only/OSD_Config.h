@@ -60,6 +60,10 @@
 //#define VERSION_RELEASE_14_06_1		// OpenPilot-RELEASE 14.06.1	'Peanuts Schnapps' .1
 //#define VERSION_RELEASE_14_10_1		// OpenPilot-RELEASE 14.10.1	'Mini Me' .1
 #define VERSION_RELEASE_15_01_1			// OpenPilot-RELEASE 15.01.1	'Look, Ma... No Hands!' .1
+//#define VERSION_RELEASE_15_02_1		// OpenPilot-RELEASE 15.02.1	'not out yet' .1
+
+// Version string
+#define VERSION_STRING		osd.printf_P(PSTR("minoposd 15.01"));
 
 // OpenPilot additional UAVObjIds for unreleased and released versions
 #define VERSION_ADDITIONAL_UAVOBJID
@@ -67,7 +71,7 @@
 // OpenPilot Revo add ons
 //#define REVO_ADD_ONS
 
-#define MEASURE_PERIOD			95	// ms
+#define MEASURE_PERIOD		95	// ms
 
 
 // EEPROM Stepping, be careful not to overstep. 

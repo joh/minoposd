@@ -482,11 +482,12 @@ void panLogo() {
 #ifdef USE_WITH_MINRXOSD
     osd.setPanel(5, 12);
     osd.openPanel();
-    osd.printf_P(PSTR("minoposd 15.01"));
+    VERSION_STRING
 #else
     osd.setPanel(3, 5);
     osd.openPanel();
-    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|minoposd 15.01"));
+    osd.printf_P(PSTR("\x20\x20\x20\x20\x20\xba\xbb\xbc\xbd\xbe|\x20\x20\x20\x20\x20\xca\xcb\xcc\xcd\xce|"));
+    VERSION_STRING
 #endif
 #ifdef PACKETRXOK_ON_MINIMOSD
     osd.printf_P(PSTR(" prxok"));
@@ -790,7 +791,7 @@ void panFlightMode(int first_col, int first_line) {
     else if (osd_mode == 15) mode_str = "poi";	// POI
     else if (osd_mode == 16) mode_str = "ac ";	// AUTOCRUISE
 #endif
-#if defined VERSION_RELEASE_15_01_1
+#if defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
     if      (osd_mode ==  0) mode_str = "man";	// MANUAL
     else if (osd_mode ==  1) mode_str = "st1";	// STABILIZED1
     else if (osd_mode ==  2) mode_str = "st2";	// STABILIZED2

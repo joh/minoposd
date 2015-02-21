@@ -38,7 +38,7 @@ static unsigned long last_gcstelemetrystats_send = 0;
 static unsigned long last_flighttelemetry_connect = 0;
 static uint8_t gcstelemetrystatus = TELEMETRYSTATS_STATE_DISCONNECTED;
 
-#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1
+#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
 static uint32_t gcstelemetrystats_objid = GCSTELEMETRYSTATS_OBJID_001;
 static uint8_t gcstelemetrystats_obj_len = GCSTELEMETRYSTATS_OBJ_LEN_001;
 static uint8_t gcstelemetrystats_obj_status = GCSTELEMETRYSTATS_OBJ_STATUS_001;
@@ -108,7 +108,7 @@ void uavtalk_show_msg(uint8_t y, uavtalk_message_t *msg) {
 	osd.printf("%2x ", c);
 	crc = crc_table[crc ^ c];
 
-#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1
+#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
 	c = (uint8_t) (msg->InstID & 0xff);
 	osd.printf("%2x ", c);
 	crc = crc_table[crc ^ c];
@@ -194,7 +194,7 @@ void uavtalk_send_msg(uavtalk_message_t *msg) {
 	Serial.write(c);
 	msg->Crc = crc_table[msg->Crc ^ c];
 
-#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1
+#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
 	c = 0; //(uint8_t) (msg->InstID & 0xff);
 	Serial.write(c);
 	msg->Crc = crc_table[msg->Crc ^ c];
@@ -323,7 +323,7 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 				break;
 				case 4:
 					msg->ObjID += ((uint32_t) c) << 24;
-#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1
+#if defined VERSION_RELEASE_14_01_1 || defined VERSION_RELEASE_14_06_1 || defined VERSION_RELEASE_14_10_1 || defined VERSION_RELEASE_15_01_1 || defined VERSION_RELEASE_15_02_1
 					status = UAVTALK_PARSE_STATE_GOT_OBJID;
 #else
 					if (msg->Length == HEADER_LEN) { // no data exists
@@ -514,6 +514,7 @@ int uavtalk_read(void) {
 				case OPLINKSTATUS_OBJID:
 #ifdef VERSION_ADDITIONAL_UAVOBJID
 				case OPLINKSTATUS_OBJID_001:
+				case OPLINKSTATUS_OBJID_002:
 #endif
         				oplm_rssi		= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_RSSI);
         				oplm_linkquality	= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_LINKQUALITY);
@@ -526,6 +527,7 @@ int uavtalk_read(void) {
 				case SYSTEMALARMS_OBJID_002:
 				case SYSTEMALARMS_OBJID_003:
 				case SYSTEMALARMS_OBJID_004:
+				case SYSTEMALARMS_OBJID_005:
 #endif
 					op_alarm  = msg.Data[SYSTEMALARMS_ALARM_CPUOVERLOAD];
 //					op_alarm += msg.Data[SYSTEMALARMS_ALARM_EVENTSYSTEM] * 0x10;
