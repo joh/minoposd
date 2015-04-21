@@ -543,11 +543,7 @@ void panGPL(int first_col, int first_line) {
 void panGPS(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-#ifdef JR_SPECIALS	// I like it more one row style
     osd.printf("%c%10.6f     %c%10.6f", 0x83, (double)(osd_lat), 0x84, (double)(osd_lon));
-#else
-    osd.printf("%c%11.6f|%c%11.6f", 0x83, (double)osd_lat, 0x84, (double)osd_lon);
-#endif
     osd.closePanel();
 }
 
