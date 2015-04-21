@@ -16,10 +16,10 @@
 #define PROTOCOL_UAVTALK
 
 // JRChange: Flight Batt on MinimOSD:
-#define FLIGHT_BATT_ON_MINIMOSD
+//#define FLIGHT_BATT_ON_MINIMOSD
 
 // JRChange: Flight Batt on Revo:
-//#define FLIGHT_BATT_ON_REVO
+#define FLIGHT_BATT_ON_REVO
 
 // JRChange: PacketRxOk on MinimOSD:
 //#define PACKETRXOK_ON_MINIMOSD
@@ -69,7 +69,7 @@
 #define VERSION_ADDITIONAL_UAVOBJID
 
 // OpenPilot Revo add ons
-//#define REVO_ADD_ONS
+#define REVO_ADD_ONS
 
 #define MEASURE_PERIOD		95	// ms
 
