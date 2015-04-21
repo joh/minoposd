@@ -819,7 +819,7 @@ void panFlightMode(int first_col, int first_line) {
 void panBatt_A(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%c%5.2f%c", 0xE2, (double)osd_vbat_A, 0x8E);
+    osd.printf("%c%5.2f%c", 0xB5, (double)osd_vbat_A, 0x8E);
     osd.closePanel();
 }
 
