@@ -229,8 +229,7 @@ void uavtalk_respond_object(uavtalk_message_t *msg_to_respond, uint8_t type) {
 }
 
 
-#if 0 // currently unused
-void uavtalk_request_object(uint8_t id) {
+void uavtalk_request_object(uint32_t id) {
 	uavtalk_message_t msg;
 	
 	msg.Sync	= UAVTALK_SYNC_VAL;
@@ -240,7 +239,6 @@ void uavtalk_request_object(uint8_t id) {
 	
 	uavtalk_send_msg(&msg);
 }
-#endif
 
 
 void uavtalk_send_gcstelemetrystats(void) {
@@ -387,8 +385,17 @@ uint8_t uavtalk_parse_char(uint8_t c, uavtalk_message_t *msg) {
 int uavtalk_read(void) {
 	static uint8_t crlf_count = 0;
 	static uavtalk_message_t msg;
+	static uint8_t inited = 0;
 	uint8_t show_prio_info = 0;
 	
+#ifdef FLIGHT_BATT_ON_REVO
+	if (gcstelemetrystatus == TELEMETRYSTATS_STATE_CONNECTED && !inited) {
+		/* Request flight battery settings */
+		uavtalk_request_object(FLIGHTBATTERYSETTINGS_OBJID);
+		inited = 1;
+	}
+#endif
+
 	// grabbing data
 	while (!show_prio_info && Serial.available() > 0) {
 		uint8_t c = Serial.read();
@@ -507,6 +514,10 @@ int uavtalk_read(void) {
 					osd_total_A		= (int16_t) uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_CONSUMED_ENERGY);
 					osd_est_flight_time	= (int16_t) uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_ESTIMATED_FLIGHT_TIME);
 				break;
+				case FLIGHTBATTERYSETTINGS_OBJID:
+					osd_ncells_A = uavtalk_get_int8(&msg, FLIGHTBATTERYSETTINGS_OBJ_NBCELLS);
+					battv = (uint8_t)(10.0 * uavtalk_get_float(&msg, FLIGHTBATTERYSETTINGS_OBJ_VCELL_WARN) * osd_ncells_A);
+					break;
 #endif
 #ifdef REVO_ADD_ONS
 				case BAROALTITUDE_OBJID:

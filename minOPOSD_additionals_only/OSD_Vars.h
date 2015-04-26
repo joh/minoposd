@@ -69,6 +69,7 @@ static int          curr_amp_offset = 0;            // Ampere * 10000
 static uint16_t     osd_total_A = 0;                // Battery total current [mAh]
 // Flight Batt on Revo
 static uint16_t     osd_est_flight_time = 0;        // Battery estimated flight time [sec]
+static uint32_t     osd_ncells_A = 0;               // Number of battery cells
 
 
 // Panel BIT registers

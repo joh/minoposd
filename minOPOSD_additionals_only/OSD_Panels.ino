@@ -847,7 +847,21 @@ void panBatteryPercent(int first_col, int first_line) {
     osd.setPanel(first_col, first_line);
     osd.openPanel();
 #if defined FLIGHT_BATT_ON_MINIMOSD || defined FLIGHT_BATT_ON_REVO
-    osd.printf("%c%5i%c", 0xB9, osd_total_A, 0x82);
+    if (osd_total_A) {
+        /* Battery current consumed */
+        osd.printf("%c%5i%c", 0xB9, osd_total_A, 0x82);
+    } else {
+        /* Battery voltage as percent */
+        float min_volt = battv / (10.0 * osd_ncells_A);
+        float vbat_percent = 0;
+
+        if (osd_ncells_A && osd_vbat_A) {
+            vbat_percent = (100 * (osd_vbat_A - min_volt * osd_ncells_A)) /
+                (BATT_VCELL_FULL * osd_ncells_A - min_volt * osd_ncells_A);
+        }
+
+        osd.printf("%c%4.1f%c", 0xB5, vbat_percent, 0x25);
+    }
 #else
     osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
 #endif

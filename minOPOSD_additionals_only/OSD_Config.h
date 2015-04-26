@@ -21,6 +21,9 @@
 // JRChange: Flight Batt on Revo:
 #define FLIGHT_BATT_ON_REVO
 
+// Voltage per battery cell when full
+#define BATT_VCELL_FULL 4.2
+
 // JRChange: PacketRxOk on MinimOSD:
 //#define PACKETRXOK_ON_MINIMOSD
 
