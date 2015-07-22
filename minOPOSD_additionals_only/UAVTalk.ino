@@ -401,6 +401,7 @@ int uavtalk_read(void) {
 	if (gcstelemetrystatus == TELEMETRYSTATS_STATE_CONNECTED && !inited) {
 		/* Request flight battery settings */
 		uavtalk_request_object(FLIGHTBATTERYSETTINGS_OBJID);
+		uavtalk_request_object(FLIGHTBATTERYSETTINGS_OBJID_001);
 		inited = 1;
 	}
 #endif
@@ -532,6 +533,7 @@ int uavtalk_read(void) {
 					osd_est_flight_time	= (int16_t) uavtalk_get_float(&msg, FLIGHTBATTERYSTATE_OBJ_ESTIMATED_FLIGHT_TIME);
 				break;
 				case FLIGHTBATTERYSETTINGS_OBJID:
+				case FLIGHTBATTERYSETTINGS_OBJID_001:
 					osd_ncells_A = uavtalk_get_int8(&msg, FLIGHTBATTERYSETTINGS_OBJ_NBCELLS);
 					battv = (uint8_t)(10.0 * uavtalk_get_float(&msg, FLIGHTBATTERYSETTINGS_OBJ_VCELL_WARN) * osd_ncells_A);
 					break;
