@@ -334,7 +334,8 @@ void panWarn(int first_col, int first_line) {
                 case 5:						// RSSI LOW
                     if (rssi < rssi_warn_level && rssi != -99 && !rssiraw_on) {
 			warning_type = cycle;
-			warning_string = "  rssi low  ";
+			warning_string = "link quality";
+/*			warning_string = "  rssi low  "; */
 		    }
                     break;
 #ifdef JR_SPECIALS

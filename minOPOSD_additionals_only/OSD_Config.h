@@ -27,6 +27,9 @@
 // Amedee: Analog RSSI on MinimOSD:
 //#define ANALOG_RSSI_ON_MINIMOSD
 
+// RSSI from Revo
+#define RSSI_ON_REVO
+
 // JRChange: artificial horizon original version
 //#define AH_ORIGINAL_VERSION
 

@@ -60,6 +60,7 @@ static int16_t      revo_baro_alt = 0;              // Revo baro altitude
 static int8_t       oplm_rssi = 0;                  // OPLM RSSI
 static uint8_t      oplm_linkquality = 0;           // OPLM LinkQuality
 #endif
+static uint8_t      osd_receiver_quality = 0;       // Receiver Link Quality
 
 // Flight Batt on MinimOSD:
 static int          volt_div_ratio = 0;             // Volt * 100

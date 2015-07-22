@@ -539,6 +539,10 @@ int uavtalk_read(void) {
         				oplm_linkquality	= uavtalk_get_int8(&msg, OPLINKSTATUS_OBJ_LINKQUALITY);
 				break;
 #endif
+				case RECEIVERSTATUS_OBJID:
+					osd_receiver_quality	= uavtalk_get_int8(&msg, RECEIVERSTATUS_OBJ_QUALITY);
+				break;
+
 #ifdef OP_DEBUG
 				case SYSTEMALARMS_OBJID:
 #ifdef VERSION_ADDITIONAL_UAVOBJID
