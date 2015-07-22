@@ -309,6 +309,10 @@ void OnMavlinkTimer()			// duration is up to approx. 10ms depending on choosen d
     if (rssi < -99) rssi = -99;
 #endif
 
+#ifdef RSSI_ON_REVO
+    rssi = osd_receiver_quality;
+#endif /* RSSI_ON_REVO */
+
 #ifdef JR_SPECIALS
     calculateCompassPoint();		// calculate the compass point which is shown in panHeading
 #endif

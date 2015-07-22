@@ -60,6 +60,8 @@ static int16_t      revo_baro_alt = 0;              // Revo baro altitude
 static int8_t       oplm_rssi = 0;                  // OPLM RSSI
 static uint8_t      oplm_linkquality = 0;           // OPLM LinkQuality
 #endif
+static uint8_t      osd_receiver_quality = 0;       // Receiver Link Quality
+static float	    osd_txpid_cur[3] = {};	    // Current TXPID setting
 
 // Flight Batt on MinimOSD:
 static int          volt_div_ratio = 0;             // Volt * 100
@@ -114,7 +116,7 @@ byte panThr_XY[2][npanels];
 byte panFMod_XY[2][npanels];
 byte panHorizon_XY[2][npanels];
 
-// Third set of panels and their X,Y coordinate holders
+// Fourth set of panels and their X,Y coordinate holders
 byte panWarn_XY[2][npanels];
 //byte panOff_XY[2];
 byte panWindSpeed_XY[2][npanels];
@@ -124,6 +126,8 @@ byte panTune_XY[2][npanels];
 byte panRSSI_XY[2][npanels];
 byte panDistance_XY[2][npanels];
 
+// Fifth set of panels and their X,Y coordinate holders
+byte panTemp_XY[2][npanels];
 
 //*************************************************************************************************************
 // rssi variables
