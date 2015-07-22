@@ -810,6 +810,26 @@ void panFlightMode(int first_col, int first_line) {
     else if (osd_mode == 15) mode_str = "poi";	// POI
     else if (osd_mode == 16) mode_str = "ac ";	// AUTOCRUISE
 #endif    
+#if defined VERSION_RELEASE_15_05
+    if      (osd_mode ==  0) mode_str = "man";	// MANUAL
+    else if (osd_mode ==  1) mode_str = "st1";	// STABILIZED1
+    else if (osd_mode ==  2) mode_str = "st2";	// STABILIZED2
+    else if (osd_mode ==  3) mode_str = "st3";	// STABILIZED3
+    else if (osd_mode ==  4) mode_str = "st4";	// STABILIZED4
+    else if (osd_mode ==  5) mode_str = "st5";	// STABILIZED5
+    else if (osd_mode ==  6) mode_str = "st6";	// STABILIZED6
+    else if (osd_mode ==  7) mode_str = "ph ";	// POSITIONHOLD
+    else if (osd_mode ==  8) mode_str = "cl ";	// COURSELOCK
+    else if (osd_mode ==  9) mode_str = "vr ";	// VELOCITYROAM
+    else if (osd_mode == 10) mode_str = "hl ";	// HOMELEASH
+    else if (osd_mode == 11) mode_str = "pa ";	// ABSOLUTEPOSITION
+    else if (osd_mode == 12) mode_str = "rtb";	// RETURNTOBASE
+    else if (osd_mode == 13) mode_str = "lan";	// LAND
+    else if (osd_mode == 14) mode_str = "pp ";	// PATHPLANNER
+    else if (osd_mode == 15) mode_str = "poi";	// POI
+    else if (osd_mode == 16) mode_str = "ac ";	// AUTOCRUISE
+    else if (osd_mode == 17) mode_str = "at ";	// AUTOTAKEOFF
+#endif
     osd.printf("%c%s", 0xE0, mode_str);
     osd.closePanel();
 }
