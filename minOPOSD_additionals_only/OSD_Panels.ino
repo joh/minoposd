@@ -880,6 +880,7 @@ void panBatteryPercent(int first_col, int first_line) {
         if (osd_ncells_A && osd_vbat_A) {
             vbat_percent = (100 * (osd_vbat_A - min_volt * osd_ncells_A)) /
                 (BATT_VCELL_FULL * osd_ncells_A - min_volt * osd_ncells_A);
+            vbat_percent = max(0, vbat_percent);
         }
 
         osd.printf("%c%4.1f%c", 0xB5, vbat_percent, 0x25);
