@@ -543,6 +543,12 @@ int uavtalk_read(void) {
 					osd_receiver_quality	= uavtalk_get_int8(&msg, RECEIVERSTATUS_OBJ_QUALITY);
 				break;
 
+				case TXPIDSTATUS_OBJID:
+					osd_txpid_cur[0]	= uavtalk_get_float(&msg, TXPIDSTATUS_OBJ_CURPID1);
+					osd_txpid_cur[1]	= uavtalk_get_float(&msg, TXPIDSTATUS_OBJ_CURPID2);
+					osd_txpid_cur[2]	= uavtalk_get_float(&msg, TXPIDSTATUS_OBJ_CURPID3);
+				break;
+
 #ifdef OP_DEBUG
 				case SYSTEMALARMS_OBJID:
 #ifdef VERSION_ADDITIONAL_UAVOBJID

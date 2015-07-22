@@ -140,6 +140,7 @@ void writePanels() {
             if (ISa(panel,BatA_BIT))		panBatt_A(panBatt_A_XY[0][panel], panBatt_A_XY[1][panel]);
             if (ISc(panel,CurA_BIT))		panCur_A(panCur_A_XY[0][panel], panCur_A_XY[1][panel]);
             if (ISa(panel,Bp_BIT))		panBatteryPercent(panBatteryPercent_XY[0][panel], panBatteryPercent_XY[1][panel]);
+            if (ISe(panel,TEMP_BIT))		panTxPID(panTemp_XY[0][panel], panTemp_XY[1][panel]);
             if (ISb(panel,Time_BIT))		panTime(panTime_XY[0][panel], panTime_XY[1][panel]);
 	    
             if (ISc(panel,Hor_BIT))		panHorizon(panHorizon_XY[0][panel], panHorizon_XY[1][panel]);
@@ -876,6 +877,27 @@ void panBatteryPercent(int first_col, int first_line) {
 #else
     osd.printf("%c%3.0i%c", 0xB9, osd_battery_remaining_A, 0x25);
 #endif
+    osd.closePanel();
+}
+
+
+/******************************************************************/
+// Panel  : panTxPID
+// Needs  : X, Y locations
+// Output : Current TxPID settings
+/******************************************************************/
+void panTxPID(int first_col, int first_line) {
+    osd.setPanel(first_col, first_line);
+    osd.openPanel();
+    osd.printf("%1.5f", (double)osd_txpid_cur[0]);
+    osd.closePanel();
+    osd.setPanel(first_col, first_line + 1);
+    osd.openPanel();
+    osd.printf("%1.5f", (double)osd_txpid_cur[1]);
+    osd.closePanel();
+    osd.setPanel(first_col, first_line + 2);
+    osd.openPanel();
+    osd.printf("%1.5f", (double)osd_txpid_cur[2]);
     osd.closePanel();
 }
 
