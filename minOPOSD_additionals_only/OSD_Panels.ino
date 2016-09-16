@@ -808,7 +808,7 @@ void panFlightMode(int first_col, int first_line) {
     else if (osd_mode == 15) mode_str = "poi";	// POI
     else if (osd_mode == 16) mode_str = "ac ";	// AUTOCRUISE
 #endif    
-#if defined VERSION_RELEASE_15_05
+#if defined VERSION_RELEASE_15_05 || defined VERSION_RELEASE_15_09
     if      (osd_mode ==  0) mode_str = "man";	// MANUAL
     else if (osd_mode ==  1) mode_str = "st1";	// STABILIZED1
     else if (osd_mode ==  2) mode_str = "st2";	// STABILIZED2
